@@ -25,6 +25,7 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.DeleteOutline
+import androidx.compose.material.icons.rounded.Image
 import androidx.compose.material.icons.rounded.PhotoLibrary
 import androidx.compose.material.icons.rounded.QrCodeScanner
 import androidx.compose.material.icons.rounded.Remove
@@ -49,6 +50,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -76,6 +78,7 @@ fun ProductEditorScreen(productId: Long, onDone: () -> Unit) {
     val snackbar = remember { SnackbarHostState() }
     var scanning by remember { mutableStateOf(false) }
     var capturing by remember { mutableStateOf(false) }
+    var choosingImage by rememberSaveable { mutableStateOf(false) }
     var confirmDelete by remember { mutableStateOf(false) }
     var showErrors by remember { mutableStateOf(false) }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -112,7 +115,7 @@ fun ProductEditorScreen(productId: Long, onDone: () -> Unit) {
             // Photo
             Row(verticalAlignment = Alignment.CenterVertically) {
                 ProductThumb(
-                    Product(name = form.name.ifBlank { "?" }, priceCents = 0, imagePath = form.imagePath),
+                    Product(name = form.name.ifBlank { "?" }, priceCents = 0, imagePath = form.imagePath, templateKey = form.templateKey),
                     Modifier.size(112.dp),
                     MaterialTheme.shapes.large,
                 )
@@ -124,10 +127,20 @@ fun ProductEditorScreen(productId: Long, onDone: () -> Unit) {
                     TextButton(onClick = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }) {
                         Icon(Icons.Rounded.PhotoLibrary, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("From gallery")
                     }
+                    TextButton(onClick = { choosingImage = true }) {
+                        Icon(Icons.Rounded.Image, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Choose image")
+                    }
+                }
+            }
+            if (form.imagePath != null || form.templateKey != null) {
+                TextButton(onClick = vm::removeImage) {
+                    Icon(Icons.Rounded.DeleteOutline, null, Modifier.size(18.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Remove image")
                 }
             }
             OutlinedTextField(
-                value = form.name, onValueChange = { v -> vm.edit { it.copy(name = v) } },
+                value = form.name, onValueChange = vm::setName,
                 label = { Text("Product name") }, singleLine = true,
                 isError = showErrors && form.nameError, modifier = Modifier.fillMaxWidth(),
             )
@@ -179,7 +192,15 @@ fun ProductEditorScreen(productId: Long, onDone: () -> Unit) {
     }
 
     if (scanning) BarcodeScannerDialog(onScanned = { code -> vm.edit { it.copy(barcode = code) } }, onDismiss = { scanning = false })
-    if (capturing) PhotoCaptureDialog(onCaptured = { path -> vm.edit { it.copy(imagePath = path) } }, onDismiss = { capturing = false })
+    if (capturing) PhotoCaptureDialog(onCaptured = vm::setPhoto, onDismiss = { capturing = false })
+    if (choosingImage) {
+        ProductTemplatePicker(
+            productName = form.name,
+            selectedKey = form.templateKey,
+            onSelected = { template -> vm.chooseTemplate(template.key); choosingImage = false },
+            onDismiss = { choosingImage = false },
+        )
+    }
     if (confirmDelete) {
         AlertDialog(
             onDismissRequest = { confirmDelete = false },

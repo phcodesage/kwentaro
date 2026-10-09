@@ -1,5 +1,6 @@
 package com.phcodesage.kwentaro.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -29,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
 import com.phcodesage.kwentaro.KwentaroApp
 import com.phcodesage.kwentaro.data.Product
+import com.phcodesage.kwentaro.data.ProductTemplates
 import java.io.File
 
 /** Builds a ViewModel with access to the app-wide repositories. */
@@ -38,13 +41,21 @@ inline fun <reified VM : ViewModel> appViewModel(key: String? = null, crossinlin
     return viewModel(key = key, factory = viewModelFactory { initializer { create(app) } })
 }
 
-/** Product photo, or a colored monogram tile when the product has none. */
+/** A saved photo, then a built-in illustration, then the colored monogram. */
 @Composable
 fun ProductThumb(product: Product, modifier: Modifier = Modifier, shape: Shape = MaterialTheme.shapes.medium) {
     Box(modifier.clip(shape), contentAlignment = Alignment.Center) {
         val path = product.imagePath
+        val template = ProductTemplates.byKey(product.templateKey)
         if (path != null && File(path).exists()) {
             AsyncImage(model = File(path), contentDescription = product.name, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+        } else if (template != null) {
+            Image(
+                painter = painterResource(template.res),
+                contentDescription = product.name,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceContainer).padding(6.dp),
+            )
         } else {
             val scheme = MaterialTheme.colorScheme
             val tilePalette = listOf(

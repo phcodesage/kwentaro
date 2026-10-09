@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.phcodesage.kwentaro.data.PosRepository
 import com.phcodesage.kwentaro.data.Product
+import com.phcodesage.kwentaro.data.ProductTemplates
 import com.phcodesage.kwentaro.data.SettingsRepository
 import com.phcodesage.kwentaro.ui.camera.productPhotoFile
 import com.phcodesage.kwentaro.util.centsToInput
@@ -32,6 +33,7 @@ data class ProductForm(
     val stock: String = "0",
     val lowStock: String = "5",
     val imagePath: String? = null,
+    val templateKey: String? = null,
     val createdAt: Long = System.currentTimeMillis(),
     val loaded: Boolean = false,
 ) {
@@ -50,6 +52,7 @@ class ProductEditorViewModel(
     val categories = repo.categories
     val settings = settingsRepo.settings
     val isNew get() = productId == 0L
+    private var imageSelectionEdited = false
 
     init {
         if (productId != 0L) viewModelScope.launch {
@@ -58,7 +61,7 @@ class ProductEditorViewModel(
                     id = p.id, name = p.name, barcode = p.barcode.orEmpty(), category = p.category,
                     price = p.priceCents.centsToInput(), cost = p.costCents.centsToInput(),
                     stock = p.stock.toString(), lowStock = p.lowStockThreshold.toString(),
-                    imagePath = p.imagePath, createdAt = p.createdAt, loaded = true,
+                    imagePath = p.imagePath, templateKey = p.templateKey, createdAt = p.createdAt, loaded = true,
                 )
             }
         }
@@ -66,13 +69,38 @@ class ProductEditorViewModel(
 
     fun edit(transform: (ProductForm) -> ProductForm) = form.update(transform)
 
+    fun setName(name: String) = edit { current ->
+        current.copy(
+            name = name,
+            templateKey = if (isNew && !imageSelectionEdited && current.imagePath == null)
+                ProductTemplates.strongSuggestion(name)?.key else current.templateKey,
+        )
+    }
+
+    fun chooseTemplate(key: String) {
+        if (ProductTemplates.byKey(key) == null) return
+        imageSelectionEdited = true
+        edit { it.copy(templateKey = key, imagePath = null) }
+    }
+
+    fun setPhoto(path: String) {
+        imageSelectionEdited = true
+        edit { it.copy(imagePath = path, templateKey = null) }
+    }
+
+    fun removeImage() {
+        imageSelectionEdited = true
+        edit { it.copy(imagePath = null, templateKey = null) }
+    }
+
     fun importPhoto(context: Context, uri: Uri) = viewModelScope.launch {
         val path = withContext(Dispatchers.IO) {
             val dest = productPhotoFile(context)
-            context.contentResolver.openInputStream(uri)?.use { input -> dest.outputStream().use { input.copyTo(it) } }
+            val input = context.contentResolver.openInputStream(uri) ?: return@withContext null
+            input.use { source -> dest.outputStream().use { source.copyTo(it) } }
             dest.absolutePath
         }
-        edit { it.copy(imagePath = path) }
+        path?.let(::setPhoto)
     }
 
     /** Returns an error message, or null after saving. */
@@ -95,6 +123,7 @@ class ProductEditorViewModel(
                 stock = f.stock.toIntOrNull() ?: 0,
                 lowStockThreshold = f.lowStock.toIntOrNull() ?: 5,
                 imagePath = f.imagePath,
+                templateKey = f.templateKey,
                 createdAt = f.createdAt,
             )
         )

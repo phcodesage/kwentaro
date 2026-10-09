@@ -19,6 +19,7 @@ data class Product(
     val stock: Int = 0,
     val lowStockThreshold: Int = 5,
     val imagePath: String? = null,
+    val templateKey: String? = null,
     val archived: Boolean = false,
     val createdAt: Long = System.currentTimeMillis(),
 ) {
