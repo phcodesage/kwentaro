@@ -67,7 +67,7 @@ fun ProductThumb(product: Product, modifier: Modifier = Modifier, shape: Shape =
             val (container, content) = tilePalette[(product.name.hashCode() and Int.MAX_VALUE) % tilePalette.size]
             Box(Modifier.fillMaxSize().background(container), contentAlignment = Alignment.Center) {
                 Text(
-                    product.name.split(" ").filter { it.isNotBlank() }.take(2).joinToString("") { it.first().uppercase() },
+                    product.name.split(" ").filter { it.firstOrNull()?.isLetterOrDigit() == true }.take(2).joinToString("") { it.first().uppercase() },
                     color = content, fontWeight = FontWeight.Bold, fontSize = 22.sp,
                 )
             }

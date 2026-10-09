@@ -97,7 +97,7 @@ fun ProductTemplatePicker(
                     }
                 }
             }
-            if (suggestions.isNotEmpty()) {
+            if (suggestions.isNotEmpty() && search.isBlank()) {
                 item(key = "picker-suggestions", span = { GridItemSpan(maxLineSpan) }) {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text("Suggested", style = MaterialTheme.typography.titleSmall)

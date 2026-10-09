@@ -14,6 +14,7 @@ Kwentaro has no accounts, no server, and no subscription. All data stays on the 
 </p>
 <p>
   <img src="docs/screenshots/scanner.png" width="200" alt="Barcode scanner">
+  <img src="docs/screenshots/template-picker.png" width="200" alt="Built-in product images">
   <img src="docs/screenshots/product-editor.png" width="200" alt="Product editor with camera photo">
   <img src="docs/screenshots/insights.png" width="200" alt="Insights">
   <img src="docs/screenshots/dark-register.png" width="200" alt="Dark theme">
@@ -23,7 +24,7 @@ Kwentaro has no accounts, no server, and no subscription. All data stays on the 
 
 - **Register.** A product grid with search and category filters. Tap a product to add it, and adjust quantities in the cart. You can also apply a 5/10/20% discount. Quantities can't exceed stock on hand.
 - **Camera barcode scanning.** Uses CameraX and on-device ML Kit, and reads EAN, UPC, QR, Code 128 and more. In continuous mode, every scan adds the item to the cart. There is a flashlight toggle, and the scanner falls back to the front camera on devices that have no rear camera.
-- **Product photos.** Take a photo in the app with CameraX or pick one from the gallery. Products without a photo get a colored monogram tile.
+- **Product images.** Take a photo in the app with CameraX, pick one from the gallery, or choose from **126 built-in illustrations** of everyday PH store items (kape, pandesal, itlog, sardinas, e-load, and more). The illustrations are searchable in English and Tagalog. They are tiny vector drawables, about 63 KB in the APK for the whole set. New products get a matching image picked automatically from their name. Products with no image get a colored monogram tile.
 - **Checkout.** Pay by cash, card or e-wallet. For cash, quick-tender chips (Exact, next ₱20/50/100/500…) fill in the amount and the change is calculated live. You can add an optional customer name.
 - **VAT/tax.** Tax can be included in the price (the default, 12% PH VAT) or added on top. Money is stored in centavos, so totals never drift.
 - **Receipts.** Each sale gets a receipt number (`KW-YYMMDD-#####`). Receipts can be shared as text through any app (Messenger, Viber, email…). You can refund a sale, which puts its items back into stock.

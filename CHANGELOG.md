@@ -11,4 +11,5 @@ First release.
 - Checkout with cash/card/e-wallet, quick-tender and live change
 - VAT inclusive/exclusive tax, receipts with share and refund
 - Inventory with low-stock alerts; sales insights dashboard
+- 126 built-in product illustrations with a searchable picker and name-based auto-suggest
 - Kwentaro logo, themed launcher icon, Palengke light/dark Material 3 theme
