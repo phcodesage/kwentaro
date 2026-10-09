@@ -250,7 +250,7 @@ private fun CartBar(count: Int, total: String, onClick: () -> Unit) {
             Icon(Icons.Rounded.ShoppingBasket, null)
             Spacer(Modifier.width(12.dp))
             Text("$count item${if (count == 1) "" else "s"}", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-            Text(total, style = MoneyStyle.merge(MaterialTheme.typography.titleMedium))
+            Text(total, style = MaterialTheme.typography.titleMedium.merge(MoneyStyle))
         }
     }
 }
@@ -290,7 +290,7 @@ private fun CartPanel(state: RegisterState, vm: RegisterViewModel, onCharge: () 
         Spacer(Modifier.height(4.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Total", style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
-            Text(state.totals.totalCents.formatMoney(cur), style = MoneyStyle.merge(MaterialTheme.typography.headlineSmall), color = MaterialTheme.colorScheme.primary)
+            Text(state.totals.totalCents.formatMoney(cur), style = MaterialTheme.typography.headlineSmall.merge(MoneyStyle), color = MaterialTheme.colorScheme.primary)
         }
         Spacer(Modifier.height(16.dp))
         Button(
@@ -339,7 +339,7 @@ private fun CheckoutSheet(totalCents: Long, currency: String, onDismiss: () -> U
         Column(Modifier.padding(horizontal = 24.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Column {
                 Text("Amount due", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(totalCents.formatMoney(currency), style = MoneyStyle.merge(MaterialTheme.typography.displaySmall), color = MaterialTheme.colorScheme.primary)
+                Text(totalCents.formatMoney(currency), style = MaterialTheme.typography.displaySmall.merge(MoneyStyle), color = MaterialTheme.colorScheme.primary)
             }
             SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
                 PaymentMethod.entries.forEachIndexed { i, m ->
@@ -374,7 +374,7 @@ private fun CheckoutSheet(totalCents: Long, currency: String, onDismiss: () -> U
                         Text("Change", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                         Text(
                             if (enough) (tendered - totalCents).formatMoney(currency) else "—",
-                            style = MoneyStyle.merge(MaterialTheme.typography.headlineSmall),
+                            style = MaterialTheme.typography.headlineSmall.merge(MoneyStyle),
                         )
                     }
                 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- The launcher supplies the tint; the K and its gaps survive as one alpha mask. -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M38,30 H46 V78 L39.5,73 L33,78 V35 Q33,30 38,30 Z M50,44 L65,29 Q69,25 73,29 L76,32 Q79,35 76,38 L62,52 H50 Z M50,56 H62 L76,70 Q79,73 76,76 L73,79 Q69,83 65,79 L50,64 Z" />
+</vector>

@@ -19,7 +19,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +26,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -53,7 +53,7 @@ fun ProductsScreen(onEdit: (Long) -> Unit, onAdd: () -> Unit) {
     val vm = appViewModel { ProductsListViewModel(it.repository, it.settings) }
     val products by vm.products.collectAsStateWithLifecycle(emptyList())
     val settings by vm.settings.collectAsStateWithLifecycle(StoreSettings())
-    val scroll = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val scroll = TopAppBarDefaults.pinnedScrollBehavior()
     var scanning by remember { mutableStateOf(false) }
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -61,7 +61,7 @@ fun ProductsScreen(onEdit: (Long) -> Unit, onAdd: () -> Unit) {
     Scaffold(
         modifier = Modifier.nestedScroll(scroll.nestedScrollConnection),
         topBar = {
-            LargeTopAppBar(
+            TopAppBar(
                 title = { Text("Products") },
                 actions = { IconButton(onClick = { scanning = true }) { Icon(Icons.Rounded.QrCodeScanner, "Find by barcode") } },
                 scrollBehavior = scroll,

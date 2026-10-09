@@ -33,7 +33,6 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -92,11 +91,11 @@ fun SalesScreen(onOpen: (Long) -> Unit) {
     val vm = appViewModel { SalesViewModel(it.repository, it.settings) }
     val sales by vm.sales.collectAsStateWithLifecycle(emptyList())
     val settings by vm.settings.collectAsStateWithLifecycle(StoreSettings())
-    val scroll = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val scroll = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
         modifier = Modifier.nestedScroll(scroll.nestedScrollConnection),
-        topBar = { LargeTopAppBar(title = { Text("Sales") }, scrollBehavior = scroll) },
+        topBar = { TopAppBar(title = { Text("Sales") }, scrollBehavior = scroll) },
     ) { padding ->
         if (sales.isEmpty()) {
             EmptyState(Icons.Rounded.ReceiptLong, "No sales yet", "Completed sales and their receipts show up here.", Modifier.padding(padding))
@@ -227,7 +226,7 @@ private fun ReceiptPaper(s: SaleWithItems, settings: StoreSettings) {
             Line(if (settings.taxInclusive) "VAT (included)" else "Tax", s.sale.taxCents.formatMoney(cur))
             Row(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
                 Text("TOTAL", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                Text(s.sale.totalCents.formatMoney(cur), style = MoneyStyle.merge(MaterialTheme.typography.titleLarge), color = MaterialTheme.colorScheme.primary)
+                Text(s.sale.totalCents.formatMoney(cur), style = MaterialTheme.typography.titleLarge.merge(MoneyStyle), color = MaterialTheme.colorScheme.primary)
             }
             Line("Paid · ${s.sale.paymentMethod.label}", s.sale.tenderedCents.formatMoney(cur))
             if (s.sale.paymentMethod == PaymentMethod.CASH) Line("Change", s.sale.changeCents.formatMoney(cur))

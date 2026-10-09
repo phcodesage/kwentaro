@@ -12,12 +12,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,14 +51,14 @@ fun SettingsScreen() {
     var s by remember { mutableStateOf<StoreSettings?>(null) }
     var taxText by remember { mutableStateOf("") }
     LaunchedEffect(Unit) { vm.load().let { s = it; taxText = it.taxRatePercent.toString().removeSuffix(".0") } }
-    val scroll = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val scroll = TopAppBarDefaults.pinnedScrollBehavior()
 
     // Every edit persists immediately; there is no save button to forget.
     fun update(next: StoreSettings) { s = next; vm.save(next) }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scroll.nestedScrollConnection),
-        topBar = { LargeTopAppBar(title = { Text("Settings") }, scrollBehavior = scroll) },
+        topBar = { TopAppBar(title = { Text("Settings") }, scrollBehavior = scroll) },
     ) { padding ->
         val cur = s ?: return@Scaffold
         Column(

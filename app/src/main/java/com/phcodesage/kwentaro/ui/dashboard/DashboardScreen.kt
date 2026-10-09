@@ -24,11 +24,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -79,7 +79,7 @@ fun DashboardScreen() {
     val lowStock by vm.lowStock.collectAsStateWithLifecycle(emptyList())
     val settings by vm.settings.collectAsStateWithLifecycle(StoreSettings())
     val cur = settings.currencySymbol
-    val scroll = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val scroll = TopAppBarDefaults.pinnedScrollBehavior()
 
     val todayKey = vm.today.toString()
     val todayTotal = daily.firstOrNull { it.day == todayKey }
@@ -90,7 +90,7 @@ fun DashboardScreen() {
 
     Scaffold(
         modifier = Modifier.nestedScroll(scroll.nestedScrollConnection),
-        topBar = { LargeTopAppBar(title = { Text("Insights") }, scrollBehavior = scroll) },
+        topBar = { TopAppBar(title = { Text("Insights") }, scrollBehavior = scroll) },
     ) { padding ->
         Column(
             Modifier.padding(padding).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 24.dp),
@@ -114,13 +114,18 @@ fun DashboardScreen() {
 @Composable
 private fun StatTile(icon: ImageVector, label: String, value: String, modifier: Modifier, highlight: Boolean = false) {
     val colors = if (highlight) CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary)
-    else CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
+    else CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest, contentColor = MaterialTheme.colorScheme.onSurface)
     Card(modifier, colors = colors) {
         Column(Modifier.padding(16.dp)) {
-            Icon(icon, null, Modifier.size(22.dp))
+            Icon(icon, null, Modifier.size(22.dp), tint = if (highlight) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary)
             Spacer(Modifier.height(12.dp))
-            Text(value, style = MoneyStyle.merge(MaterialTheme.typography.titleLarge), maxLines = 1)
-            Text(label, style = MaterialTheme.typography.labelMedium)
+            Text(value, style = MaterialTheme.typography.titleLarge.merge(MoneyStyle), maxLines = 1)
+            Text(
+                label,
+                style = MaterialTheme.typography.labelMedium,
+                color = if (highlight) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp),
+            )
         }
     }
 }
@@ -139,7 +144,7 @@ private fun WeekChart(daily: List<DailyTotal>, today: LocalDate, cur: String) {
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)) {
         Column(Modifier.padding(16.dp)) {
             Text("Last 7 days", style = MaterialTheme.typography.titleMedium)
-            Text(values.sum().formatMoney(cur), style = MoneyStyle.merge(MaterialTheme.typography.headlineSmall), color = MaterialTheme.colorScheme.primary)
+            Text(values.sum().formatMoney(cur), style = MaterialTheme.typography.headlineSmall.merge(MoneyStyle), color = MaterialTheme.colorScheme.primary)
             Spacer(Modifier.height(16.dp))
             Canvas(Modifier.fillMaxWidth().height(140.dp)) {
                 val gap = 12.dp.toPx()

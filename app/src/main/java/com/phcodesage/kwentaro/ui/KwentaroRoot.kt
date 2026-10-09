@@ -1,10 +1,12 @@
 package com.phcodesage.kwentaro.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.Insights
@@ -23,12 +25,14 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -38,6 +42,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.phcodesage.kwentaro.R
 import com.phcodesage.kwentaro.ui.dashboard.DashboardScreen
 import com.phcodesage.kwentaro.ui.products.ProductEditorScreen
 import com.phcodesage.kwentaro.ui.products.ProductsScreen
@@ -74,7 +79,17 @@ fun KwentaroRoot() {
             Row {
                 if (showNav) {
                     NavigationRail(header = {
-                        Text("K", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(vertical = 12.dp))
+                        Surface(
+                            color = colorResource(R.color.ic_launcher_background),
+                            shape = MaterialTheme.shapes.medium,
+                            modifier = Modifier.padding(vertical = 12.dp),
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.ic_kwentaro_mark),
+                                contentDescription = "Kwentaro",
+                                modifier = Modifier.size(48.dp),
+                            )
+                        }
                     }) {
                         Spacer(Modifier.height(8.dp))
                         Tab.entries.forEach { tab ->

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 108 108" role="img" aria-labelledby="title desc">
+  <title id="title">Kwentaro</title>
+  <desc id="desc">A paper and mango tally K on a deep jade background. The upright has a receipt tear, and the two counting strokes are separated by a clear gap.</desc>
+  <rect width="108" height="108" fill="#0B5D4E"/>
+  <path fill="#FBF7EF" d="M38,30 H46 V78 L39.5,73 L33,78 V35 Q33,30 38,30 Z"/>
+  <path fill="#F2A541" d="M50,44 L65,29 Q69,25 73,29 L76,32 Q79,35 76,38 L62,52 H50 Z"/>
+  <path fill="#FBF7EF" d="M50,56 H62 L76,70 Q79,73 76,76 L73,79 Q69,83 65,79 L50,64 Z"/>
+</svg>

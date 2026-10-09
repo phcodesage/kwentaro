@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="72"
+    android:viewportHeight="72">
+    <!-- Cropped launcher viewport for Compose, displayed on the jade brand background. -->
+    <group android:translateX="-18" android:translateY="-18">
+        <path
+            android:fillColor="@color/kwentaro_paper"
+            android:pathData="M38,30 H46 V78 L39.5,73 L33,78 V35 Q33,30 38,30 Z" />
+        <path
+            android:fillColor="@color/kwentaro_mango"
+            android:pathData="M50,44 L65,29 Q69,25 73,29 L76,32 Q79,35 76,38 L62,52 H50 Z" />
+        <path
+            android:fillColor="@color/kwentaro_paper"
+            android:pathData="M50,56 H62 L76,70 Q79,73 76,76 L73,79 Q69,83 65,79 L50,64 Z" />
+    </group>
+</vector>

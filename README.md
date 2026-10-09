@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/brand/logo-wordmark.svg" width="420" alt="Kwentaro"></p>
+
 # Kwentaro
 
 **Kwentaro** is an offline-first point-of-sale app for Android, written in Kotlin with Jetpack Compose and Material 3. It's built for sari-sari stores, cafés, bakeries and market stalls. The name comes from the Filipino *kwenta*, to count or tally.
@@ -14,6 +16,7 @@ Kwentaro has no accounts, no server, and no subscription. All data stays on the 
   <img src="docs/screenshots/scanner.png" width="200" alt="Barcode scanner">
   <img src="docs/screenshots/product-editor.png" width="200" alt="Product editor with camera photo">
   <img src="docs/screenshots/insights.png" width="200" alt="Insights">
+  <img src="docs/screenshots/dark-register.png" width="200" alt="Dark theme">
 </p>
 
 ## Features
@@ -28,6 +31,8 @@ Kwentaro has no accounts, no server, and no subscription. All data stays on the 
 - **Insights.** Today's revenue, sale count, average ticket and gross profit, plus a 7-day bar chart, the week's best sellers and a restock list.
 - **Material 3.** Custom "Palengke" jade-and-mango palette with light and dark themes and optional Material You dynamic color. Phones get a bottom bar, and tablets get a navigation rail with the cart in a side panel.
 
+Brand assets, the color palette and type notes are in [`docs/brand`](docs/brand/README.md).
+
 ## Tech
 
 | Layer | Library |
@@ -39,6 +44,13 @@ Kwentaro has no accounts, no server, and no subscription. All data stays on the 
 | Images | Coil |
 
 The minimum SDK is 26 (Android 8.0) and the target SDK is 36.
+
+## Tests
+
+```bash
+./gradlew testDebugUnitTest          # VAT, discount, money parsing, EAN-13 check digits
+./gradlew connectedDebugAndroidTest   # decodes a real EAN-13 with the bundled ML Kit scanner
+```
 
 ## Build
 

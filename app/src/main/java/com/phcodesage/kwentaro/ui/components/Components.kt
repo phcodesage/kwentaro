@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -31,7 +30,6 @@ import coil.compose.AsyncImage
 import com.phcodesage.kwentaro.KwentaroApp
 import com.phcodesage.kwentaro.data.Product
 import java.io.File
-import kotlin.math.abs
 
 /** Builds a ViewModel with access to the app-wide repositories. */
 @Composable
@@ -39,11 +37,6 @@ inline fun <reified VM : ViewModel> appViewModel(key: String? = null, crossinlin
     val app = LocalContext.current.applicationContext as KwentaroApp
     return viewModel(key = key, factory = viewModelFactory { initializer { create(app) } })
 }
-
-private val tilePalette = listOf(
-    Color(0xFF0B5D4E), Color(0xFFB4532A), Color(0xFF8A5100), Color(0xFF3D5A80),
-    Color(0xFF6B4E71), Color(0xFF2E7D32), Color(0xFF9C2F4A), Color(0xFF4F6D7A),
-)
 
 /** Product photo, or a colored monogram tile when the product has none. */
 @Composable
@@ -53,11 +46,18 @@ fun ProductThumb(product: Product, modifier: Modifier = Modifier, shape: Shape =
         if (path != null && File(path).exists()) {
             AsyncImage(model = File(path), contentDescription = product.name, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
         } else {
-            val color = tilePalette[abs(product.name.hashCode()) % tilePalette.size]
-            Box(Modifier.fillMaxSize().background(color.copy(alpha = 0.18f)), contentAlignment = Alignment.Center) {
+            val scheme = MaterialTheme.colorScheme
+            val tilePalette = listOf(
+                scheme.primaryContainer to scheme.onPrimaryContainer,
+                scheme.secondaryContainer to scheme.onSecondaryContainer,
+                scheme.tertiaryContainer to scheme.onTertiaryContainer,
+                scheme.surfaceContainerHighest to scheme.onSurfaceVariant,
+            )
+            val (container, content) = tilePalette[(product.name.hashCode() and Int.MAX_VALUE) % tilePalette.size]
+            Box(Modifier.fillMaxSize().background(container), contentAlignment = Alignment.Center) {
                 Text(
                     product.name.split(" ").filter { it.isNotBlank() }.take(2).joinToString("") { it.first().uppercase() },
-                    color = color, fontWeight = FontWeight.Bold, fontSize = 22.sp,
+                    color = content, fontWeight = FontWeight.Bold, fontSize = 22.sp,
                 )
             }
         }
