@@ -1,0 +1,17 @@
+package com.phcodesage.kwentaro.data
+
+import android.content.Context
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+
+@Database(entities = [Product::class, Sale::class, SaleItem::class], version = 1)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun productDao(): ProductDao
+    abstract fun saleDao(): SaleDao
+
+    companion object {
+        fun build(context: Context): AppDatabase =
+            Room.databaseBuilder(context, AppDatabase::class.java, "kwentaro.db").build()
+    }
+}
