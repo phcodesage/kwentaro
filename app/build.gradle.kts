@@ -5,6 +5,37 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+import java.util.Properties
+
+// Single source of truth for the app version: `appVersion` in gradle.properties.
+// versionCode is derived from it (1.2.3 -> 10203), so it always increases with semver.
+val appVersion = providers.gradleProperty("appVersion").get()
+val semver = Regex("""(\d+)\.(\d+)\.(\d+)""").matchEntire(appVersion)
+    ?: error("appVersion '$appVersion' must be MAJOR.MINOR.PATCH")
+val (major, minor, patch) = semver.destructured.toList().map(String::toInt)
+require(minor < 100 && patch < 100) { "minor and patch must be < 100 to keep versionCode monotonic" }
+val appVersionCode = major * 10_000 + minor * 100 + patch
+
+val gitSha: String = providers.exec {
+    commandLine("git", "rev-parse", "--short", "HEAD")
+    isIgnoreExitValue = true
+}.standardOutput.asText.map { it.trim().ifEmpty { "unknown" } }.getOrElse("unknown")
+
+// Release signing comes from keystore.properties locally, or KWENTARO_* env vars in CI.
+val signing = Properties().apply {
+    rootProject.file("keystore.properties").takeIf { it.exists() }?.inputStream()?.use(::load)
+    System.getenv("KWENTARO_KEYSTORE")?.let {
+        setProperty("storeFile", it)
+        setProperty("storePassword", System.getenv("KWENTARO_KEYSTORE_PASSWORD"))
+        setProperty("keyAlias", System.getenv("KWENTARO_KEY_ALIAS"))
+        setProperty("keyPassword", System.getenv("KWENTARO_KEY_PASSWORD"))
+    }
+}
+
+base {
+    archivesName = "kwentaro-v$appVersion"
+}
+
 android {
     namespace = "com.phcodesage.kwentaro"
     compileSdk = 36
@@ -13,13 +44,27 @@ android {
         applicationId = "com.phcodesage.kwentaro"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = appVersionCode
+        versionName = appVersion
+        buildConfigField("String", "GIT_SHA", "\"$gitSha\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        if (signing.getProperty("storeFile") != null) create("release") {
+            storeFile = rootProject.file(signing.getProperty("storeFile"))
+            storePassword = signing.getProperty("storePassword")
+            keyAlias = signing.getProperty("keyAlias")
+            keyPassword = signing.getProperty("keyPassword")
+        }
+    }
+
     buildTypes {
+        debug {
+            versionNameSuffix = "-debug"
+        }
         release {
+            signingConfig = signingConfigs.findByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -33,6 +78,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -76,4 +122,10 @@ dependencies {
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.kotlinx.coroutines.play.services)
+}
+
+tasks.register("printVersion") {
+    val name = appVersion
+    val code = appVersionCode
+    doLast { println("$name ($code)") }
 }

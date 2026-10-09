@@ -77,6 +77,17 @@ app/src/main/java/com/phcodesage/kwentaro/
 └── ui/theme/      Colors, type, shapes
 ```
 
+## Versioning & releases
+
+The app version is set in one place: `appVersion` in [`gradle.properties`](gradle.properties). Everything else is derived from it.
+
+- `versionName` is `1.0.0` (debug builds show `1.0.0-debug`). `versionCode` is `MAJOR*10000 + MINOR*100 + PATCH`, so `1.0.0` becomes `10000`.
+- APKs are named `kwentaro-v1.0.0-debug.apk` / `kwentaro-v1.0.0-release.apk`.
+- **Settings → About** shows the version and the git commit it was built from.
+- Run `./gradlew printVersion` to see the current version.
+
+To cut a release, bump `appVersion`, add a section to [`CHANGELOG.md`](CHANGELOG.md), commit, then push a tag `vX.Y.Z`. The Release workflow checks that the tag matches `appVersion`, builds the APKs and publishes a GitHub Release with the changelog notes. A signed release APK is also attached when the `KWENTARO_KEYSTORE_BASE64`, `KWENTARO_KEYSTORE_PASSWORD`, `KWENTARO_KEY_ALIAS` and `KWENTARO_KEY_PASSWORD` secrets are set. Locally, signing reads `keystore.properties`.
+
 ## License
 
 MIT

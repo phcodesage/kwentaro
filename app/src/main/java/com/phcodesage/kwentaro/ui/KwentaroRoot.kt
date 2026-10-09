@@ -3,6 +3,7 @@ package com.phcodesage.kwentaro.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -120,7 +121,7 @@ fun KwentaroRoot() {
                 },
                 contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0),
             ) { padding ->
-                KwentaroNavHost(nav, wide = false, modifier = Modifier.padding(padding))
+                KwentaroNavHost(nav, wide = false, modifier = Modifier.padding(padding).consumeWindowInsets(padding))
             }
         }
     }

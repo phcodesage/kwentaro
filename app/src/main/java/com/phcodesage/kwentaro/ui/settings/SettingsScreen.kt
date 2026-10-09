@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
+import com.phcodesage.kwentaro.BuildConfig
 import com.phcodesage.kwentaro.data.SettingsRepository
 import com.phcodesage.kwentaro.data.StoreSettings
 import com.phcodesage.kwentaro.ui.components.appViewModel
@@ -82,6 +83,19 @@ fun SettingsScreen() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 Section("Appearance") {
                     ToggleRow("Match wallpaper colors", "Use Material You dynamic color", cur.dynamicColor) { update(cur.copy(dynamicColor = it)) }
+                }
+            }
+            Section("About") {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Version", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+                    Text(
+                        "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                        style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Build", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+                    Text(BuildConfig.GIT_SHA, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             Text(
