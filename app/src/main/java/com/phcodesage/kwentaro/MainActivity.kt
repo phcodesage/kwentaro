@@ -9,6 +9,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
+import kotlinx.coroutines.flow.flowOf
+import com.phcodesage.kwentaro.ui.auth.AuthScreen
+import com.phcodesage.kwentaro.ui.components.SessionScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.phcodesage.kwentaro.data.StoreSettings
@@ -26,16 +31,22 @@ class MainActivity : ComponentActivity() {
         )
         val app = application as KwentaroApp
         setContent {
-            val settings by app.settings.settings.collectAsStateWithLifecycle<StoreSettings?>(null)
+            val ready by app.ready.collectAsStateWithLifecycle()
+            val session by app.sessions.session.collectAsStateWithLifecycle()
+            val settings by remember(session) { session?.settings?.settings ?: flowOf(null) }
+                .collectAsStateWithLifecycle<StoreSettings?>(null)
             KwentaroTheme(dynamicColor = settings?.dynamicColor ?: false) {
+                val active = session
                 val loaded = settings
                 when {
-                    loaded == null -> {
+                    !ready || (active != null && loaded == null) -> {
                         SolidSystemBars(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primary)
                         Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.primary) {}
                     }
-                    !loaded.onboardingDone -> OnboardingScreen(loaded, app.settings)
-                    else -> KwentaroRoot()
+                    active == null -> AuthScreen(app)
+                    !loaded!!.onboardingDone -> OnboardingScreen(loaded, active.settings)
+                    // key() rebuilds navigation per account; SessionScope isolates its ViewModels.
+                    else -> key(active.account.id) { SessionScope(active) { KwentaroRoot() } }
                 }
             }
         }

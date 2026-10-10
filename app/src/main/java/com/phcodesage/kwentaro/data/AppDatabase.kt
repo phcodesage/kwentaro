@@ -17,7 +17,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun saleDao(): SaleDao
 
     companion object {
-        fun build(context: Context): AppDatabase =
-            Room.databaseBuilder(context, AppDatabase::class.java, "kwentaro.db").build()
+        fun build(context: Context, name: String): AppDatabase =
+            Room.databaseBuilder(context, AppDatabase::class.java, name).build()
     }
 }

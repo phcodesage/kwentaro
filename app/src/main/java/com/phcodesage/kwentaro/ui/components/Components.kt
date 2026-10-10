@@ -27,18 +27,42 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
-import com.phcodesage.kwentaro.KwentaroApp
+import com.phcodesage.kwentaro.data.auth.AccountSession
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import com.phcodesage.kwentaro.data.Product
 import com.phcodesage.kwentaro.data.ProductTemplates
 import java.io.File
 
-/** Builds a ViewModel with access to the app-wide repositories. */
+/** The signed-in account's data; provided by [SessionScope]. */
+val LocalSession = staticCompositionLocalOf<AccountSession> { error("No signed-in account") }
+
+/** Builds a ViewModel bound to the signed-in account's repositories. */
 @Composable
-inline fun <reified VM : ViewModel> appViewModel(key: String? = null, crossinline create: (KwentaroApp) -> VM): VM {
-    val app = LocalContext.current.applicationContext as KwentaroApp
-    return viewModel(key = key, factory = viewModelFactory { initializer { create(app) } })
+inline fun <reified VM : ViewModel> appViewModel(key: String? = null, crossinline create: (AccountSession) -> VM): VM {
+    val session = LocalSession.current
+    return viewModel(key = key, factory = viewModelFactory { initializer { create(session) } })
+}
+
+/**
+ * Scopes the UI to one account: its own ViewModelStore (and so its own navigation state), cleared
+ * when the account signs out, so nothing from one person's session survives into another's.
+ */
+@Composable
+fun SessionScope(session: AccountSession, content: @Composable () -> Unit) {
+    val owner = remember(session) {
+        object : ViewModelStoreOwner {
+            override val viewModelStore = ViewModelStore()
+        }
+    }
+    DisposableEffect(owner) { onDispose { owner.viewModelStore.clear() } }
+    CompositionLocalProvider(LocalSession provides session, LocalViewModelStoreOwner provides owner, content = content)
 }
 
 /** A saved photo, then a built-in illustration, then the colored monogram. */

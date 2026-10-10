@@ -1,11 +1,11 @@
 package com.phcodesage.kwentaro.data
 
-import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -19,9 +19,8 @@ data class StoreSettings(
     val onboardingDone: Boolean = false,
 )
 
-private val Context.dataStore by preferencesDataStore("settings")
-
-class SettingsRepository(private val context: Context) {
+/** Settings for one account; the DataStore file is per account (see SessionManager). */
+class SettingsRepository(private val dataStore: DataStore<Preferences>) {
     private object Keys {
         val storeName = stringPreferencesKey("store_name")
         val currency = stringPreferencesKey("currency")
@@ -32,7 +31,7 @@ class SettingsRepository(private val context: Context) {
         val onboardingDone = booleanPreferencesKey("onboarding_done")
     }
 
-    val settings: Flow<StoreSettings> = context.dataStore.data.map { p ->
+    val settings: Flow<StoreSettings> = dataStore.data.map { p ->
         val d = StoreSettings()
         StoreSettings(
             storeName = p[Keys.storeName] ?: d.storeName,
@@ -46,7 +45,7 @@ class SettingsRepository(private val context: Context) {
     }
 
     suspend fun update(s: StoreSettings) {
-        context.dataStore.edit { p ->
+        dataStore.edit { p ->
             p[Keys.storeName] = s.storeName
             p[Keys.currency] = s.currencySymbol
             p[Keys.taxRate] = s.taxRatePercent
@@ -58,12 +57,12 @@ class SettingsRepository(private val context: Context) {
     }
 
     suspend fun setOnboardingDone(done: Boolean) {
-        context.dataStore.edit { it[Keys.onboardingDone] = done }
+        dataStore.edit { it[Keys.onboardingDone] = done }
     }
 
     /** Commit setup and completion together, preserving tax, appearance and receipt preferences. */
     suspend fun completeOnboarding(storeName: String, currencySymbol: String) {
-        context.dataStore.edit {
+        dataStore.edit {
             it[Keys.storeName] = storeName.trim()
             it[Keys.currency] = currencySymbol.trim()
             it[Keys.onboardingDone] = true

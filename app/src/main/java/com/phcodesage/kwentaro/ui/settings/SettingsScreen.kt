@@ -73,6 +73,7 @@ fun SettingsScreen() {
             Modifier.padding(padding).verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            AccountSection()
             Section("Store") {
                 OutlinedTextField(colors = solidTextFieldColors(), value = cur.storeName, onValueChange = { update(cur.copy(storeName = it)) }, label = { Text("Store name") }, singleLine = true, modifier = Modifier.fillMaxWidth())
                 OutlinedTextField(colors = solidTextFieldColors(), value = cur.currencySymbol, onValueChange = { update(cur.copy(currencySymbol = it.take(4))) }, label = { Text("Currency symbol") }, singleLine = true, modifier = Modifier.fillMaxWidth())
