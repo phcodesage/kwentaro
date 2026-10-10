@@ -1,21 +1,25 @@
 package com.phcodesage.kwentaro.ui
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.Insights
+import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.PointOfSale
 import androidx.compose.material.icons.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.rounded.Inventory2
 import androidx.compose.material.icons.rounded.Insights
+import androidx.compose.material.icons.rounded.Inventory2
 import androidx.compose.material.icons.rounded.PointOfSale
 import androidx.compose.material.icons.rounded.ReceiptLong
 import androidx.compose.material.icons.rounded.Settings
@@ -23,8 +27,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -51,6 +57,7 @@ import com.phcodesage.kwentaro.ui.register.RegisterScreen
 import com.phcodesage.kwentaro.ui.sales.ReceiptScreen
 import com.phcodesage.kwentaro.ui.sales.SalesScreen
 import com.phcodesage.kwentaro.ui.settings.SettingsScreen
+import com.phcodesage.kwentaro.ui.theme.SolidSystemBars
 
 private enum class Tab(val route: String, val label: String, val icon: ImageVector, val selectedIcon: ImageVector) {
     Register("register", "Sell", Icons.Outlined.PointOfSale, Icons.Rounded.PointOfSale),
@@ -76,10 +83,12 @@ fun KwentaroRoot() {
 
     BoxWithConstraints {
         val wide = maxWidth >= 600.dp
+        val colors = MaterialTheme.colorScheme
+        SolidSystemBars(colors.primary, if (showNav && !wide) colors.primary else colors.surface)
         if (wide) {
-            Row {
+            Row(Modifier.fillMaxSize().background(colors.primary)) {
                 if (showNav) {
-                    NavigationRail(header = {
+                    NavigationRail(containerColor = colors.primary, contentColor = colors.onPrimary, header = {
                         Surface(
                             color = colorResource(R.color.ic_launcher_background),
                             shape = MaterialTheme.shapes.medium,
@@ -99,22 +108,36 @@ fun KwentaroRoot() {
                                 onClick = { go(tab) },
                                 icon = { Icon(if (tab == currentTab) tab.selectedIcon else tab.icon, null) },
                                 label = { Text(tab.label) },
+                                colors = NavigationRailItemDefaults.colors(
+                                    selectedIconColor = colors.onTertiaryContainer,
+                                    selectedTextColor = colors.onPrimary,
+                                    indicatorColor = colors.tertiaryContainer,
+                                    unselectedIconColor = colors.onPrimary,
+                                    unselectedTextColor = colors.onPrimary,
+                                ),
                             )
                         }
                     }
                 }
-                KwentaroNavHost(nav, wide = true)
+                KwentaroNavHost(nav, wide = true, modifier = Modifier.weight(1f).background(colors.surface))
             }
         } else {
             Scaffold(
                 bottomBar = {
-                    if (showNav) NavigationBar {
+                    if (showNav) NavigationBar(containerColor = colors.primary, contentColor = colors.onPrimary, tonalElevation = 0.dp) {
                         Tab.entries.forEach { tab ->
                             NavigationBarItem(
                                 selected = tab == currentTab,
                                 onClick = { go(tab) },
                                 icon = { Icon(if (tab == currentTab) tab.selectedIcon else tab.icon, null) },
                                 label = { Text(tab.label) },
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = colors.onTertiaryContainer,
+                                    selectedTextColor = colors.onPrimary,
+                                    indicatorColor = colors.tertiaryContainer,
+                                    unselectedIconColor = colors.onPrimary,
+                                    unselectedTextColor = colors.onPrimary,
+                                ),
                             )
                         }
                     }
@@ -129,7 +152,7 @@ fun KwentaroRoot() {
 
 @Composable
 private fun KwentaroNavHost(nav: NavHostController, wide: Boolean, modifier: Modifier = Modifier) {
-    NavHost(nav, startDestination = Tab.Register.route, modifier = modifier) {
+    NavHost(nav, startDestination = Tab.Register.route, modifier = modifier, enterTransition = { EnterTransition.None }, exitTransition = { ExitTransition.None }) {
         composable(Tab.Register.route) {
             RegisterScreen(wide = wide, onCheckedOut = { id -> nav.navigate("receipt/$id") })
         }

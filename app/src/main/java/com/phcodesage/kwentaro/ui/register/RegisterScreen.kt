@@ -31,22 +31,22 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.QrCodeScanner
 import androidx.compose.material.icons.rounded.Remove
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.ShoppingBasket
-import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -81,6 +81,13 @@ import com.phcodesage.kwentaro.ui.components.EmptyState
 import com.phcodesage.kwentaro.ui.components.ProductThumb
 import com.phcodesage.kwentaro.ui.components.appViewModel
 import com.phcodesage.kwentaro.ui.theme.MoneyStyle
+import com.phcodesage.kwentaro.ui.theme.SolidFilterChip
+import com.phcodesage.kwentaro.ui.theme.SolidSystemBars
+import com.phcodesage.kwentaro.ui.theme.actionTextColor
+import com.phcodesage.kwentaro.ui.theme.solidButtonColors
+import com.phcodesage.kwentaro.ui.theme.solidTextButtonColors
+import com.phcodesage.kwentaro.ui.theme.solidTextFieldColors
+import com.phcodesage.kwentaro.ui.theme.solidTonalIconButtonColors
 import com.phcodesage.kwentaro.util.formatMoney
 import com.phcodesage.kwentaro.util.parseMoneyToCents
 
@@ -110,9 +117,13 @@ fun RegisterScreen(wide: Boolean, onCheckedOut: (Long) -> Unit) {
             if (wide) {
                 Surface(
                     Modifier.weight(1f).fillMaxHeight(),
-                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                    color = MaterialTheme.colorScheme.primary,
                 ) {
-                    CartPanel(state, vm, onCharge = { showCheckout = true }, Modifier.windowInsetsPadding(WindowInsets.statusBars))
+                    Column(Modifier.windowInsetsPadding(WindowInsets.statusBars)) {
+                        Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surfaceContainerLow) {
+                            CartPanel(state, vm, onCharge = { showCheckout = true })
+                        }
+                    }
                 }
             }
         }
@@ -131,7 +142,8 @@ fun RegisterScreen(wide: Boolean, onCheckedOut: (Long) -> Unit) {
     }
 
     if (showCart && !wide) {
-        ModalBottomSheet(onDismissRequest = { showCart = false }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
+        ModalBottomSheet(containerColor = MaterialTheme.colorScheme.surfaceContainerLow, tonalElevation = 0.dp, onDismissRequest = { showCart = false }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
+            SolidSystemBars(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.surfaceContainerLow)
             CartPanel(state, vm, onCharge = { showCart = false; showCheckout = true })
         }
     }
@@ -153,32 +165,40 @@ fun RegisterScreen(wide: Boolean, onCheckedOut: (Long) -> Unit) {
 
 @Composable
 private fun CatalogHeader(state: RegisterState, vm: RegisterViewModel, onScan: () -> Unit) {
-    Column(Modifier.windowInsetsPadding(WindowInsets.statusBars).padding(top = 12.dp)) {
-        Row(Modifier.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Text("Register", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-                Text(state.settings.storeName, style = MaterialTheme.typography.headlineSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            }
-            FilledTonalIconButton(onClick = onScan, modifier = Modifier.size(52.dp)) {
-                Icon(Icons.Rounded.QrCodeScanner, "Scan barcode")
+    val colors = MaterialTheme.colorScheme
+    Column {
+        Surface(color = colors.primary, contentColor = colors.onPrimary) {
+            Column(Modifier.windowInsetsPadding(WindowInsets.statusBars).padding(top = 12.dp)) {
+                Row(Modifier.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text("Register", style = MaterialTheme.typography.labelLarge)
+                        Text(state.settings.storeName, style = MaterialTheme.typography.headlineSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                    FilledTonalIconButton(
+                        colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = colors.tertiaryContainer, contentColor = colors.onTertiaryContainer),
+                        onClick = onScan, modifier = Modifier.size(52.dp),
+                    ) { Icon(Icons.Rounded.QrCodeScanner, "Scan barcode") }
+                }
+                OutlinedTextField(
+                    colors = solidTextFieldColors(),
+                    value = state.query,
+                    onValueChange = vm::setQuery,
+                    placeholder = { Text("Search name or barcode") },
+                    leadingIcon = { Icon(Icons.Rounded.Search, null) },
+                    trailingIcon = {
+                        if (state.query.isNotEmpty()) IconButton(onClick = { vm.setQuery("") }) { Icon(Icons.Rounded.Close, "Clear search") }
+                    },
+                    singleLine = true,
+                    shape = CircleShape,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp),
+                )
             }
         }
-        OutlinedTextField(
-            value = state.query,
-            onValueChange = vm::setQuery,
-            placeholder = { Text("Search name or barcode") },
-            leadingIcon = { Icon(Icons.Rounded.Search, null) },
-            trailingIcon = {
-                if (state.query.isNotEmpty()) IconButton(onClick = { vm.setQuery("") }) { Icon(Icons.Rounded.Close, "Clear search") }
-            },
-            singleLine = true,
-            shape = CircleShape,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
-        )
+        Spacer(Modifier.height(8.dp))
         LazyRow(contentPadding = PaddingValues(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            item { FilterChip(selected = state.selectedCategory == null, onClick = { vm.selectCategory(null) }, label = { Text("All") }) }
+            item { SolidFilterChip(selected = state.selectedCategory == null, onClick = { vm.selectCategory(null) }, label = { Text("All") }) }
             items(state.categories) { c ->
-                FilterChip(selected = state.selectedCategory == c, onClick = { vm.selectCategory(if (state.selectedCategory == c) null else c) }, label = { Text(c) })
+                SolidFilterChip(selected = state.selectedCategory == c, onClick = { vm.selectCategory(if (state.selectedCategory == c) null else c) }, label = { Text(c) })
             }
         }
         Spacer(Modifier.height(8.dp))
@@ -206,18 +226,24 @@ private fun ProductGrid(state: RegisterState, onTap: (Product) -> Unit, contentP
 @Composable
 private fun ProductCard(p: Product, inCart: Int, currency: String, onClick: () -> Unit) {
     val out = p.stock <= 0
+    val colors = MaterialTheme.colorScheme
+    val selected = inCart > 0 && !out
+    val foreground = if (selected) colors.onPrimaryContainer else colors.onSurface
     Card(
         onClick = onClick,
         enabled = !out,
         colors = CardDefaults.cardColors(
-            containerColor = if (inCart > 0) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerLowest,
+            containerColor = if (selected) colors.primaryContainer else colors.surfaceContainerLowest,
+            contentColor = foreground,
+            disabledContainerColor = colors.surfaceContainerHighest,
+            disabledContentColor = colors.onSurfaceVariant,
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (inCart > 0) 0.dp else 1.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp, pressedElevation = 0.dp, focusedElevation = 0.dp, hoveredElevation = 0.dp, draggedElevation = 0.dp, disabledElevation = 0.dp),
     ) {
         Box {
             ProductThumb(p, Modifier.fillMaxWidth().aspectRatio(1.35f).padding(8.dp))
             if (inCart > 0) {
-                Badge(Modifier.align(Alignment.TopEnd).padding(14.dp), containerColor = MaterialTheme.colorScheme.tertiary) {
+                Badge(Modifier.align(Alignment.TopEnd).padding(14.dp), containerColor = colors.tertiaryContainer, contentColor = colors.onTertiaryContainer) {
                     Text("×$inCart", style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp))
                 }
             }
@@ -225,11 +251,11 @@ private fun ProductCard(p: Product, inCart: Int, currency: String, onClick: () -
         Column(Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp)) {
             Text(p.name, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(p.priceCents.formatMoney(currency), style = MoneyStyle, color = MaterialTheme.colorScheme.primary, modifier = Modifier.weight(1f))
+                Text(p.priceCents.formatMoney(currency), style = MoneyStyle, color = if (selected) foreground else actionTextColor, modifier = Modifier.weight(1f))
                 Text(
-                    if (out) "Out" else "${p.stock} left",
+                    if (out) "Out" else if (p.isLowStock) "Low: ${p.stock}" else "${p.stock} left",
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (p.isLowStock) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = if (selected) foreground else if (p.isLowStock) colors.error else colors.onSurfaceVariant,
                 )
             }
         }
@@ -241,9 +267,9 @@ private fun CartBar(count: Int, total: String, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
         shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.primary,
-        contentColor = MaterialTheme.colorScheme.onPrimary,
-        shadowElevation = 6.dp,
+        color = MaterialTheme.colorScheme.tertiaryContainer,
+        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+        shadowElevation = 0.dp,
         modifier = Modifier.fillMaxWidth().padding(16.dp),
     ) {
         Row(Modifier.padding(horizontal = 20.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -261,7 +287,7 @@ private fun CartPanel(state: RegisterState, vm: RegisterViewModel, onCharge: () 
     Column(modifier.fillMaxWidth().padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Current sale", style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
-            if (state.lines.isNotEmpty()) TextButton(onClick = vm::clear) {
+            if (state.lines.isNotEmpty()) TextButton(colors = solidTextButtonColors(), onClick = vm::clear) {
                 Icon(Icons.Rounded.DeleteSweep, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Clear")
             }
         }
@@ -278,7 +304,7 @@ private fun CartPanel(state: RegisterState, vm: RegisterViewModel, onCharge: () 
         Text("Discount", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(vertical = 6.dp)) {
             listOf(0, 5, 10, 20).forEach { d ->
-                FilterChip(selected = state.discountPercent == d, onClick = { vm.setDiscount(d) }, label = { Text(if (d == 0) "None" else "$d%") })
+                SolidFilterChip(selected = state.discountPercent == d, onClick = { vm.setDiscount(d) }, label = { Text(if (d == 0) "None" else "$d%") })
             }
         }
         TotalRow("Subtotal", state.totals.subtotalCents.formatMoney(cur))
@@ -290,10 +316,11 @@ private fun CartPanel(state: RegisterState, vm: RegisterViewModel, onCharge: () 
         Spacer(Modifier.height(4.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Total", style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
-            Text(state.totals.totalCents.formatMoney(cur), style = MaterialTheme.typography.headlineSmall.merge(MoneyStyle), color = MaterialTheme.colorScheme.primary)
+            Text(state.totals.totalCents.formatMoney(cur), style = MaterialTheme.typography.headlineSmall.merge(MoneyStyle), color = actionTextColor)
         }
         Spacer(Modifier.height(16.dp))
         Button(
+            colors = solidButtonColors(),
             onClick = onCharge,
             enabled = state.lines.isNotEmpty(),
             modifier = Modifier.fillMaxWidth().height(56.dp),
@@ -320,9 +347,9 @@ private fun CartRow(line: CartLine, cur: String, vm: RegisterViewModel) {
             Text(line.product.name, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(line.totalCents.formatMoney(cur), style = MoneyStyle, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        FilledTonalIconButton(onClick = { vm.decrement(line.product) }, modifier = Modifier.size(34.dp)) { Icon(Icons.Rounded.Remove, "Less") }
+        FilledTonalIconButton(colors = solidTonalIconButtonColors(), onClick = { vm.decrement(line.product) }, modifier = Modifier.size(34.dp)) { Icon(Icons.Rounded.Remove, "Less") }
         Text("${line.quantity}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.width(36.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-        FilledTonalIconButton(onClick = { vm.add(line.product) }, modifier = Modifier.size(34.dp)) { Icon(Icons.Rounded.Add, "More") }
+        FilledTonalIconButton(colors = solidTonalIconButtonColors(), onClick = { vm.add(line.product) }, modifier = Modifier.size(34.dp)) { Icon(Icons.Rounded.Add, "More") }
     }
 }
 
@@ -335,11 +362,12 @@ private fun CheckoutSheet(totalCents: Long, currency: String, onDismiss: () -> U
     val tendered = tenderedText.parseMoneyToCents() ?: 0L
     val enough = method != PaymentMethod.CASH || tendered >= totalCents
 
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
+    ModalBottomSheet(containerColor = MaterialTheme.colorScheme.surfaceContainerLow, tonalElevation = 0.dp, onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
+        SolidSystemBars(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.surfaceContainerLow)
         Column(Modifier.padding(horizontal = 24.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Column {
                 Text("Amount due", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(totalCents.formatMoney(currency), style = MaterialTheme.typography.displaySmall.merge(MoneyStyle), color = MaterialTheme.colorScheme.primary)
+                Text(totalCents.formatMoney(currency), style = MaterialTheme.typography.displaySmall.merge(MoneyStyle), color = actionTextColor)
             }
             SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
                 PaymentMethod.entries.forEachIndexed { i, m ->
@@ -347,11 +375,18 @@ private fun CheckoutSheet(totalCents: Long, currency: String, onDismiss: () -> U
                         selected = method == m,
                         onClick = { method = m },
                         shape = SegmentedButtonDefaults.itemShape(i, PaymentMethod.entries.size),
+                        colors = SegmentedButtonDefaults.colors(
+                            activeContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                            activeContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                            inactiveContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                            inactiveContentColor = MaterialTheme.colorScheme.onSurface,
+                        ),
                     ) { Text(m.label) }
                 }
             }
             if (method == PaymentMethod.CASH) {
                 OutlinedTextField(
+                    colors = solidTextFieldColors(),
                     value = tenderedText,
                     onValueChange = { tenderedText = it.filter { c -> c.isDigit() || c == '.' } },
                     label = { Text("Cash received") },
@@ -362,7 +397,7 @@ private fun CheckoutSheet(totalCents: Long, currency: String, onDismiss: () -> U
                 )
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(quickCash(totalCents)) { c ->
-                        FilterChip(
+                        SolidFilterChip(
                             selected = tendered == c,
                             onClick = { tenderedText = (c / 100).toString() + if (c % 100 != 0L) ".%02d".format(c % 100) else "" },
                             label = { Text(if (c == totalCents) "Exact" else c.formatMoney(currency)) },
@@ -380,10 +415,12 @@ private fun CheckoutSheet(totalCents: Long, currency: String, onDismiss: () -> U
                 }
             }
             OutlinedTextField(
+                colors = solidTextFieldColors(),
                 value = customer, onValueChange = { customer = it },
                 label = { Text("Customer name (optional)") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
             )
             Button(
+                colors = solidButtonColors(),
                 onClick = { onConfirm(method, tendered, customer) },
                 enabled = enough,
                 modifier = Modifier.fillMaxWidth().height(56.dp),

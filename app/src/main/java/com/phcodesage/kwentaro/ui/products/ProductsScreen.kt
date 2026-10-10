@@ -17,6 +17,7 @@ import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -35,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,6 +46,7 @@ import com.phcodesage.kwentaro.ui.components.EmptyState
 import com.phcodesage.kwentaro.ui.components.ProductThumb
 import com.phcodesage.kwentaro.ui.components.appViewModel
 import com.phcodesage.kwentaro.ui.theme.MoneyStyle
+import com.phcodesage.kwentaro.ui.theme.solidTopAppBarColors
 import com.phcodesage.kwentaro.util.formatMoney
 import kotlinx.coroutines.launch
 
@@ -62,13 +65,19 @@ fun ProductsScreen(onEdit: (Long) -> Unit, onAdd: () -> Unit) {
         modifier = Modifier.nestedScroll(scroll.nestedScrollConnection),
         topBar = {
             TopAppBar(
+                colors = solidTopAppBarColors(),
                 title = { Text("Products") },
                 actions = { IconButton(onClick = { scanning = true }) { Icon(Icons.Rounded.QrCodeScanner, "Find by barcode") } },
                 scrollBehavior = scroll,
             )
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(onClick = onAdd, icon = { Icon(Icons.Rounded.Add, null) }, text = { Text("New product") })
+            ExtendedFloatingActionButton(
+                onClick = onAdd, icon = { Icon(Icons.Rounded.Add, null) }, text = { Text("New product") },
+                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp, pressedElevation = 0.dp, focusedElevation = 0.dp, hoveredElevation = 0.dp),
+            )
         },
         snackbarHost = { SnackbarHost(snackbar) },
     ) { padding ->
@@ -78,7 +87,7 @@ fun ProductsScreen(onEdit: (Long) -> Unit, onAdd: () -> Unit) {
             LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(top = padding.calculateTopPadding(), bottom = 96.dp)) {
                 items(products, key = { it.id }) { p ->
                     ListItem(
-                        modifier = Modifier.clickable { onEdit(p.id) }.padding(horizontal = 8.dp),
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp).clip(MaterialTheme.shapes.medium).clickable { onEdit(p.id) },
                         headlineContent = { Text(p.name) },
                         supportingContent = {
                             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -92,14 +101,18 @@ fun ProductsScreen(onEdit: (Long) -> Unit, onAdd: () -> Unit) {
                                 AssistChip(
                                     onClick = { onEdit(p.id) },
                                     label = { Text("${p.stock} in stock") },
+                                    border = null,
                                     colors = if (p.isLowStock) AssistChipDefaults.assistChipColors(
                                         containerColor = MaterialTheme.colorScheme.errorContainer,
                                         labelColor = MaterialTheme.colorScheme.onErrorContainer,
-                                    ) else AssistChipDefaults.assistChipColors(),
+                                    ) else AssistChipDefaults.assistChipColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                        labelColor = MaterialTheme.colorScheme.onSurface,
+                                    ),
                                 )
                             }
                         },
-                        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surface),
+                        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest),
                     )
                 }
             }

@@ -67,6 +67,9 @@ import com.phcodesage.kwentaro.data.StoreSettings
 import com.phcodesage.kwentaro.ui.components.EmptyState
 import com.phcodesage.kwentaro.ui.components.appViewModel
 import com.phcodesage.kwentaro.ui.theme.MoneyStyle
+import com.phcodesage.kwentaro.ui.theme.actionTextColor
+import com.phcodesage.kwentaro.ui.theme.solidTextButtonColors
+import com.phcodesage.kwentaro.ui.theme.solidTopAppBarColors
 import com.phcodesage.kwentaro.util.formatDateTime
 import com.phcodesage.kwentaro.util.formatMoney
 import com.phcodesage.kwentaro.util.receiptNumber
@@ -95,7 +98,7 @@ fun SalesScreen(onOpen: (Long) -> Unit) {
 
     Scaffold(
         modifier = Modifier.nestedScroll(scroll.nestedScrollConnection),
-        topBar = { TopAppBar(title = { Text("Sales") }, scrollBehavior = scroll) },
+        topBar = { TopAppBar(colors = solidTopAppBarColors(), title = { Text("Sales") }, scrollBehavior = scroll) },
     ) { padding ->
         if (sales.isEmpty()) {
             EmptyState(Icons.Rounded.ReceiptLong, "No sales yet", "Completed sales and their receipts show up here.", Modifier.padding(padding))
@@ -140,6 +143,7 @@ fun ReceiptScreen(saleId: Long, onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
+                colors = solidTopAppBarColors(),
                 title = { Text("Receipt") },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Back") } },
             )
@@ -181,8 +185,8 @@ fun ReceiptScreen(saleId: Long, onBack: () -> Unit) {
             onDismissRequest = { confirmRefund = false },
             title = { Text("Refund this sale?") },
             text = { Text("The sale is marked refunded and every item goes back into stock.") },
-            confirmButton = { TextButton(onClick = { vm.refund(saleId); confirmRefund = false }) { Text("Refund") } },
-            dismissButton = { TextButton(onClick = { confirmRefund = false }) { Text("Cancel") } },
+            confirmButton = { TextButton(colors = solidTextButtonColors(), onClick = { vm.refund(saleId); confirmRefund = false }) { Text("Refund") } },
+            dismissButton = { TextButton(colors = solidTextButtonColors(), onClick = { confirmRefund = false }) { Text("Cancel") } },
         )
     }
 }
@@ -194,7 +198,7 @@ private fun ReceiptPaper(s: SaleWithItems, settings: StoreSettings) {
         Modifier.widthIn(max = 420.dp).fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceContainerLowest,
-        shadowElevation = 2.dp,
+        shadowElevation = 0.dp,
     ) {
         Column(Modifier.padding(24.dp)) {
             Text(settings.storeName, style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
@@ -226,7 +230,7 @@ private fun ReceiptPaper(s: SaleWithItems, settings: StoreSettings) {
             Line(if (settings.taxInclusive) "VAT (included)" else "Tax", s.sale.taxCents.formatMoney(cur))
             Row(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
                 Text("TOTAL", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                Text(s.sale.totalCents.formatMoney(cur), style = MaterialTheme.typography.titleLarge.merge(MoneyStyle), color = MaterialTheme.colorScheme.primary)
+                Text(s.sale.totalCents.formatMoney(cur), style = MaterialTheme.typography.titleLarge.merge(MoneyStyle), color = actionTextColor)
             }
             Line("Paid · ${s.sale.paymentMethod.label}", s.sale.tenderedCents.formatMoney(cur))
             if (s.sale.paymentMethod == PaymentMethod.CASH) Line("Change", s.sale.changeCents.formatMoney(cur))

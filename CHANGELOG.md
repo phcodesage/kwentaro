@@ -2,6 +2,11 @@
 
 All notable changes to Kwentaro are documented here. Versions follow [Semantic Versioning](https://semver.org); the version lives in `gradle.properties` (`appVersion`).
 
+## [1.1.0]
+
+- Onboarding: four original Lottie intro animations (sell, scan, receipt, insights) with a store setup step; shown on first launch, replayable from Settings → Replay intro; respects reduced motion
+- Bold "solid" theme: solid jade bars and navigation with mango accents, filled chips, solid CTAs and stat tiles, flat cards; light and dark (all text WCAG AA)
+
 ## [1.0.0]
 
 First release.

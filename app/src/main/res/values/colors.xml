@@ -2,6 +2,6 @@
     <color name="kwentaro_jade">#FF0B5D4E</color>
     <color name="kwentaro_mango">#FFF2A541</color>
     <color name="kwentaro_paper">#FFFBF7EF</color>
-    <color name="splash_bg">@color/kwentaro_paper</color>
+    <color name="splash_bg">@color/kwentaro_jade</color>
     <color name="ic_launcher_background">@color/kwentaro_jade</color>
 </resources>

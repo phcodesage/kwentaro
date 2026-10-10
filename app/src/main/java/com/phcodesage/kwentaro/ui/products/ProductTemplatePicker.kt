@@ -1,6 +1,5 @@
 package com.phcodesage.kwentaro.ui.products
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,15 +11,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -44,6 +42,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.phcodesage.kwentaro.data.ProductTemplate
 import com.phcodesage.kwentaro.data.ProductTemplates
+import com.phcodesage.kwentaro.ui.theme.SolidFilterChip
+import com.phcodesage.kwentaro.ui.theme.SolidSystemBars
+import com.phcodesage.kwentaro.ui.theme.solidTextFieldColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,9 +64,14 @@ fun ProductTemplatePicker(
     }
 
     ModalBottomSheet(
+
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+
+        tonalElevation = 0.dp,
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     ) {
+        SolidSystemBars(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.surfaceContainerLow)
         // Headers scroll with the tiles so the keyboard/large text never hides the grid.
         LazyVerticalGrid(
             columns = GridCells.Adaptive(96.dp),
@@ -79,6 +85,7 @@ fun ProductTemplatePicker(
             }
             item(key = "picker-search", span = { GridItemSpan(maxLineSpan) }) {
                 OutlinedTextField(
+                    colors = solidTextFieldColors(),
                     value = search,
                     onValueChange = { search = it },
                     label = { Text("Search images") },
@@ -90,10 +97,10 @@ fun ProductTemplatePicker(
             item(key = "picker-categories", span = { GridItemSpan(maxLineSpan) }) {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     item {
-                        FilterChip(selected = category == null, onClick = { category = null }, label = { Text("All") })
+                        SolidFilterChip(selected = category == null, onClick = { category = null }, label = { Text("All") })
                     }
                     items(categories, key = { it }) { name ->
-                        FilterChip(selected = category == name, onClick = { category = name }, label = { Text(name) })
+                        SolidFilterChip(selected = category == name, onClick = { category = name }, label = { Text(name) })
                     }
                 }
             }
@@ -141,8 +148,8 @@ private fun TemplateTile(
         onClick = { onSelected(template) },
         modifier = modifier.semantics { selected = isSelected },
         shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surfaceContainer,
-        border = if (isSelected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
+        color = if (isSelected) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.surfaceContainer,
+        contentColor = if (isSelected) MaterialTheme.colorScheme.onTertiaryContainer else MaterialTheme.colorScheme.onSurface,
     ) {
         Column(
             Modifier.padding(8.dp),

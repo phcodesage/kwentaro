@@ -34,7 +34,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -64,6 +63,12 @@ import com.phcodesage.kwentaro.ui.camera.BarcodeScannerDialog
 import com.phcodesage.kwentaro.ui.camera.PhotoCaptureDialog
 import com.phcodesage.kwentaro.ui.components.ProductThumb
 import com.phcodesage.kwentaro.ui.components.appViewModel
+import com.phcodesage.kwentaro.ui.theme.SolidFilterChip
+import com.phcodesage.kwentaro.ui.theme.solidButtonColors
+import com.phcodesage.kwentaro.ui.theme.solidTextButtonColors
+import com.phcodesage.kwentaro.ui.theme.solidTextFieldColors
+import com.phcodesage.kwentaro.ui.theme.solidTonalIconButtonColors
+import com.phcodesage.kwentaro.ui.theme.solidTopAppBarColors
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,6 +93,7 @@ fun ProductEditorScreen(productId: Long, onDone: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
+                colors = solidTopAppBarColors(),
                 title = { Text(if (vm.isNew) "New product" else "Edit product") },
                 navigationIcon = { IconButton(onClick = onDone) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Back") } },
                 actions = {
@@ -98,6 +104,7 @@ fun ProductEditorScreen(productId: Long, onDone: () -> Unit) {
         snackbarHost = { SnackbarHost(snackbar) },
         bottomBar = {
             Button(
+                colors = solidButtonColors(),
                 onClick = {
                     showErrors = true
                     scope.launch { vm.save()?.let { snackbar.showSnackbar(it) } ?: onDone() }
@@ -124,39 +131,43 @@ fun ProductEditorScreen(productId: Long, onDone: () -> Unit) {
                     FilledTonalButton(onClick = { capturing = true }) {
                         Icon(Icons.Rounded.CameraAlt, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Take photo")
                     }
-                    TextButton(onClick = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }) {
+                    TextButton(colors = solidTextButtonColors(), onClick = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }) {
                         Icon(Icons.Rounded.PhotoLibrary, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("From gallery")
                     }
-                    TextButton(onClick = { choosingImage = true }) {
+                    TextButton(colors = solidTextButtonColors(), onClick = { choosingImage = true }) {
                         Icon(Icons.Rounded.Image, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Choose image")
                     }
                 }
             }
             if (form.imagePath != null || form.templateKey != null) {
-                TextButton(onClick = vm::removeImage) {
+                TextButton(colors = solidTextButtonColors(), onClick = vm::removeImage) {
                     Icon(Icons.Rounded.DeleteOutline, null, Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
                     Text("Remove image")
                 }
             }
             OutlinedTextField(
+                colors = solidTextFieldColors(),
                 value = form.name, onValueChange = vm::setName,
                 label = { Text("Product name") }, singleLine = true,
                 isError = showErrors && form.nameError, modifier = Modifier.fillMaxWidth(),
             )
             OutlinedTextField(
+                colors = solidTextFieldColors(),
                 value = form.barcode, onValueChange = { v -> vm.edit { it.copy(barcode = v) } },
                 label = { Text("Barcode / SKU") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
                 trailingIcon = { IconButton(onClick = { scanning = true }) { Icon(Icons.Rounded.QrCodeScanner, "Scan barcode") } },
             )
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(
+                    colors = solidTextFieldColors(),
                     value = form.price, onValueChange = { v -> vm.edit { it.copy(price = v.filter { c -> c.isDigit() || c == '.' }) } },
                     label = { Text("Price") }, prefix = { Text(settings.currencySymbol) }, singleLine = true,
                     isError = showErrors && form.priceError,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.weight(1f),
                 )
                 OutlinedTextField(
+                    colors = solidTextFieldColors(),
                     value = form.cost, onValueChange = { v -> vm.edit { it.copy(cost = v.filter { c -> c.isDigit() || c == '.' }) } },
                     label = { Text("Cost") }, prefix = { Text(settings.currencySymbol) }, singleLine = true,
                     supportingText = { Text("For profit reports") },
@@ -164,24 +175,27 @@ fun ProductEditorScreen(productId: Long, onDone: () -> Unit) {
                 )
             }
             OutlinedTextField(
+                colors = solidTextFieldColors(),
                 value = form.category, onValueChange = { v -> vm.edit { it.copy(category = v) } },
                 label = { Text("Category") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
             )
             if (categories.isNotEmpty()) {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(categories) { c -> FilterChip(selected = form.category == c, onClick = { vm.edit { it.copy(category = c) } }, label = { Text(c) }) }
+                    items(categories) { c -> SolidFilterChip(selected = form.category == c, onClick = { vm.edit { it.copy(category = c) } }, label = { Text(c) }) }
                 }
             }
             Text("Inventory", style = MaterialTheme.typography.titleMedium)
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilledTonalIconButton(onClick = { vm.edit { it.copy(stock = ((it.stock.toIntOrNull() ?: 0) - 1).coerceAtLeast(0).toString()) } }) { Icon(Icons.Rounded.Remove, "Less stock") }
+                FilledTonalIconButton(colors = solidTonalIconButtonColors(), onClick = { vm.edit { it.copy(stock = ((it.stock.toIntOrNull() ?: 0) - 1).coerceAtLeast(0).toString()) } }) { Icon(Icons.Rounded.Remove, "Less stock") }
                 OutlinedTextField(
+                    colors = solidTextFieldColors(),
                     value = form.stock, onValueChange = { v -> vm.edit { it.copy(stock = v.filter(Char::isDigit)) } },
                     label = { Text("In stock") }, singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(1f),
                 )
-                FilledTonalIconButton(onClick = { vm.edit { it.copy(stock = ((it.stock.toIntOrNull() ?: 0) + 1).toString()) } }) { Icon(Icons.Rounded.Add, "More stock") }
+                FilledTonalIconButton(colors = solidTonalIconButtonColors(), onClick = { vm.edit { it.copy(stock = ((it.stock.toIntOrNull() ?: 0) + 1).toString()) } }) { Icon(Icons.Rounded.Add, "More stock") }
                 OutlinedTextField(
+                    colors = solidTextFieldColors(),
                     value = form.lowStock, onValueChange = { v -> vm.edit { it.copy(lowStock = v.filter(Char::isDigit)) } },
                     label = { Text("Alert at") }, singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(0.8f),
@@ -207,8 +221,8 @@ fun ProductEditorScreen(productId: Long, onDone: () -> Unit) {
             icon = { Icon(Icons.Rounded.DeleteOutline, null) },
             title = { Text("Delete ${form.name}?") },
             text = { Text("It disappears from the register. Past sales keep their records.") },
-            confirmButton = { TextButton(onClick = { scope.launch { vm.delete(); onDone() } }) { Text("Delete") } },
-            dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("Cancel") } },
+            confirmButton = { TextButton(colors = solidTextButtonColors(), onClick = { scope.launch { vm.delete(); onDone() } }) { Text("Delete") } },
+            dismissButton = { TextButton(colors = solidTextButtonColors(), onClick = { confirmDelete = false }) { Text("Cancel") } },
         )
     }
 }

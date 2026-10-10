@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
@@ -50,7 +51,12 @@ import com.phcodesage.kwentaro.data.SettingsRepository
 import com.phcodesage.kwentaro.data.StoreSettings
 import com.phcodesage.kwentaro.data.TopProduct
 import com.phcodesage.kwentaro.ui.components.appViewModel
+import com.phcodesage.kwentaro.ui.theme.Clay
+import com.phcodesage.kwentaro.ui.theme.Ink
 import com.phcodesage.kwentaro.ui.theme.MoneyStyle
+import com.phcodesage.kwentaro.ui.theme.Paper
+import com.phcodesage.kwentaro.ui.theme.actionTextColor
+import com.phcodesage.kwentaro.ui.theme.solidTopAppBarColors
 import com.phcodesage.kwentaro.util.formatMoney
 import java.time.LocalDate
 import java.time.ZoneId
@@ -90,7 +96,7 @@ fun DashboardScreen() {
 
     Scaffold(
         modifier = Modifier.nestedScroll(scroll.nestedScrollConnection),
-        topBar = { TopAppBar(title = { Text("Insights") }, scrollBehavior = scroll) },
+        topBar = { TopAppBar(colors = solidTopAppBarColors(), title = { Text("Insights") }, scrollBehavior = scroll) },
     ) { padding ->
         Column(
             Modifier.padding(padding).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 24.dp),
@@ -99,10 +105,11 @@ fun DashboardScreen() {
             Text("Today", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp), maxItemsInEachRow = 4) {
                 val tile = Modifier.weight(1f).widthIn(min = 150.dp)
-                StatTile(Icons.Rounded.Payments, "Revenue", revenue.formatMoney(cur), tile, highlight = true)
-                StatTile(Icons.Rounded.ReceiptLong, "Sales", count.toString(), tile)
-                StatTile(Icons.Rounded.TrendingUp, "Avg. ticket", (if (count > 0) revenue / count else 0L).formatMoney(cur), tile)
-                StatTile(Icons.Rounded.Savings, "Gross profit", profit.formatMoney(cur), tile)
+                val colors = MaterialTheme.colorScheme
+                StatTile(Icons.Rounded.Payments, "Revenue", revenue.formatMoney(cur), tile, colors.primary, colors.onPrimary)
+                StatTile(Icons.Rounded.ReceiptLong, "Sales", count.toString(), tile, colors.tertiaryContainer, colors.onTertiaryContainer)
+                StatTile(Icons.Rounded.TrendingUp, "Avg. ticket", (if (count > 0) revenue / count else 0L).formatMoney(cur), tile, Clay, Paper)
+                StatTile(Icons.Rounded.Savings, "Gross profit", profit.formatMoney(cur), tile, Ink, Paper)
             }
             WeekChart(daily, vm.today, cur)
             TopProductsCard(top, cur)
@@ -112,18 +119,17 @@ fun DashboardScreen() {
 }
 
 @Composable
-private fun StatTile(icon: ImageVector, label: String, value: String, modifier: Modifier, highlight: Boolean = false) {
-    val colors = if (highlight) CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary)
-    else CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest, contentColor = MaterialTheme.colorScheme.onSurface)
+private fun StatTile(icon: ImageVector, label: String, value: String, modifier: Modifier, background: Color, foreground: Color) {
+    val colors = CardDefaults.cardColors(containerColor = background, contentColor = foreground)
     Card(modifier, colors = colors) {
         Column(Modifier.padding(16.dp)) {
-            Icon(icon, null, Modifier.size(22.dp), tint = if (highlight) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary)
+            Icon(icon, null, Modifier.size(22.dp), tint = foreground)
             Spacer(Modifier.height(12.dp))
             Text(value, style = MaterialTheme.typography.titleLarge.merge(MoneyStyle), maxLines = 1)
             Text(
                 label,
                 style = MaterialTheme.typography.labelMedium,
-                color = if (highlight) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                color = foreground,
                 modifier = Modifier.padding(top = 4.dp),
             )
         }
@@ -136,15 +142,15 @@ private fun WeekChart(daily: List<DailyTotal>, today: LocalDate, cur: String) {
     val byDay = daily.associateBy { it.day }
     val values = days.map { byDay[it.toString()]?.totalCents ?: 0L }
     val max = (values.maxOrNull() ?: 0L).coerceAtLeast(1L)
-    val bar = MaterialTheme.colorScheme.primary
-    val todayBar = MaterialTheme.colorScheme.tertiary
+    val bar = actionTextColor
+    val todayBar = MaterialTheme.colorScheme.tertiaryContainer
     val track = MaterialTheme.colorScheme.surfaceContainerHigh
     val fmt = DateTimeFormatter.ofPattern("EEE")
 
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)) {
         Column(Modifier.padding(16.dp)) {
             Text("Last 7 days", style = MaterialTheme.typography.titleMedium)
-            Text(values.sum().formatMoney(cur), style = MaterialTheme.typography.headlineSmall.merge(MoneyStyle), color = MaterialTheme.colorScheme.primary)
+            Text(values.sum().formatMoney(cur), style = MaterialTheme.typography.headlineSmall.merge(MoneyStyle), color = actionTextColor)
             Spacer(Modifier.height(16.dp))
             Canvas(Modifier.fillMaxWidth().height(140.dp)) {
                 val gap = 12.dp.toPx()
@@ -193,7 +199,10 @@ private fun TopProductsCard(top: List<TopProduct>, cur: String) {
 
 @Composable
 private fun LowStockCard(items: List<Product>) {
-    Card(colors = CardDefaults.cardColors(containerColor = if (items.isEmpty()) MaterialTheme.colorScheme.surfaceContainerLowest else MaterialTheme.colorScheme.errorContainer)) {
+    Card(colors = CardDefaults.cardColors(
+        containerColor = if (items.isEmpty()) MaterialTheme.colorScheme.surfaceContainerLowest else MaterialTheme.colorScheme.errorContainer,
+        contentColor = if (items.isEmpty()) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onErrorContainer,
+    )) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(if (items.isEmpty()) Icons.Rounded.Inventory else Icons.Rounded.WarningAmber, null)

@@ -22,70 +22,95 @@ The manifest points both `android:icon` and `android:roundIcon` to `@mipmap/ic_l
 
 ## Palengke palette
 
-Jade is the action color. Mango is the accent for quantities and money moments. Warm paper and olive-tinted ink provide a quiet backdrop for a busy register. The lighter primary container softens selected product cards, while a separate red clay family distinguishes errors from mango accents.
+Jade is the action fill. Mango is the accent for selected controls, quantities, and money moments. Warm paper is the working canvas; deep ink and red clay give the dashboard a bold, distinct rhythm.
 
-These are the **default brand schemes** in `ui/theme/Theme.kt`; all 48 color roles exposed by Material 3 1.4 are set explicitly. The existing optional wallpaper-color setting still selects Android's dynamic scheme. Launcher and rail branding retain the brand colors in either mode.
+### Solid is the principle
+
+Use **opaque, flat color blocks**. Top bars and the Register header are jade, navigation is jade with a mango indicator, selected chips are mango, and unselected chips are filled neutrals. Product cards use contrasting solid surfaces with zero elevation; selected register cards become jade with paper text. Cart bars are mango; Charge and Complete sale are jade. Insights uses jade, mango, clay (`#9C4934`), and ink (`#20251F`) stat tiles. No gradients, translucent decoration, or elevation tint. The existing camera and modal scrims remain for focus and legibility.
+
+Dark mode uses deep jade (`#08483D`) action fills and deep ink/green surfaces, with paper on dark fills. **Do not use dark primary as text on dark surfaces**: `actionTextColor` uses light jade (`#83D5BD`, the dark secondary role) for amounts, text actions, and focused field labels. Always use the matching on-color on a solid container. Low stock uses both a label and color so it remains understandable on selected cards.
+
+These are the **default brand schemes** in `ui/theme/Theme.kt`; all 48 Material 3 1.4 roles are explicit. The optional wallpaper setting retains dynamic neutral surfaces while brand action, selection, and error-container colors stay solid. Fixed roles are also solid brand fills in both modes.
 
 | Material 3 role | Light | Dark |
 | --- | --- | --- |
-| `primary` | `#0B5D4E` | `#83D5BD` |
-| `onPrimary` | `#FFFFFF` | `#00382B` |
-| `primaryContainer` | `#C6EBDD` | `#0A5142` |
-| `onPrimaryContainer` | `#073B30` | `#C6EBDD` |
+| `primary` | `#0B5D4E` | `#08483D` |
+| `onPrimary` | `#FFFFFF` | `#FBF7EF` |
+| `primaryContainer` | `#0B5D4E` | `#0B5D4E` |
+| `onPrimaryContainer` | `#FBF7EF` | `#FBF7EF` |
 | `inversePrimary` | `#83D5BD` | `#0B5D4E` |
-| `secondary` | `#526458` | `#B9CCBA` |
+| `secondary` | `#526458` | `#83D5BD` |
 | `onSecondary` | `#FFFFFF` | `#243629` |
-| `secondaryContainer` | `#D6E8D7` | `#3A5140` |
-| `onSecondaryContainer` | `#23372A` | `#D6E8D7` |
+| `secondaryContainer` | `#283D33` | `#123B31` |
+| `onSecondaryContainer` | `#FBF7EF` | `#FBF7EF` |
 | `tertiary` | `#855000` | `#F2A541` |
 | `onTertiary` | `#FFFFFF` | `#422900` |
-| `tertiaryContainer` | `#F2A541` | `#634009` |
-| `onTertiaryContainer` | `#382000` | `#FFDDA6` |
-| `background` | `#FBF7EF` | `#141813` |
-| `onBackground` | `#20251F` | `#E6E6DC` |
-| `surface` | `#FBF7EF` | `#141813` |
-| `onSurface` | `#20251F` | `#E6E6DC` |
-| `surfaceVariant` | `#EAE5D9` | `#41493F` |
+| `tertiaryContainer` | `#F2A541` | `#F2A541` |
+| `onTertiaryContainer` | `#382000` | `#382000` |
+| `background` | `#FBF7EF` | `#101E19` |
+| `onBackground` | `#20251F` | `#FBF7EF` |
+| `surface` | `#FBF7EF` | `#101E19` |
+| `onSurface` | `#20251F` | `#FBF7EF` |
+| `surfaceVariant` | `#EAE5D9` | `#283D33` |
 | `onSurfaceVariant` | `#50564D` | `#C3CBBE` |
-| `surfaceTint` | `#0B5D4E` | `#83D5BD` |
+| `surfaceTint` | `#0B5D4E` | `#08483D` |
 | `inverseSurface` | `#2D332C` | `#E6E6DC` |
 | `inverseOnSurface` | `#F5F1E7` | `#2D332C` |
 | `error` | `#A33226` | `#FFB4A6` |
 | `onError` | `#FFFFFF` | `#60190F` |
-| `errorContainer` | `#FFDAD2` | `#81281C` |
-| `onErrorContainer` | `#59180F` | `#FFDAD2` |
+| `errorContainer` | `#A33226` | `#A33226` |
+| `onErrorContainer` | `#FBF7EF` | `#FBF7EF` |
 | `outline` | `#6B7267` | `#8D9788` |
 | `outlineVariant` | `#CCC7B9` | `#41493F` |
 | `scrim` | `#000000` | `#000000` |
-| `surfaceDim` | `#DED9CE` | `#141813` |
-| `surfaceBright` | `#FBF7EF` | `#393E36` |
-| `surfaceContainerLowest` | `#FFFFFF` | `#0E120D` |
-| `surfaceContainerLow` | `#F5F1E7` | `#1C211A` |
-| `surfaceContainer` | `#EFEADF` | `#20251E` |
-| `surfaceContainerHigh` | `#E9E4D8` | `#2A2F27` |
-| `surfaceContainerHighest` | `#E3DED2` | `#353A32` |
-| `primaryFixed` | `#C6EBDD` | `#C6EBDD` |
-| `primaryFixedDim` | `#83D5BD` | `#83D5BD` |
-| `onPrimaryFixed` | `#002117` | `#002117` |
-| `onPrimaryFixedVariant` | `#174F40` | `#174F40` |
-| `secondaryFixed` | `#D6E8D7` | `#D6E8D7` |
-| `secondaryFixedDim` | `#B9CCBA` | `#B9CCBA` |
-| `onSecondaryFixed` | `#102516` | `#102516` |
-| `onSecondaryFixedVariant` | `#3A5140` | `#3A5140` |
-| `tertiaryFixed` | `#FFDDA6` | `#FFDDA6` |
-| `tertiaryFixedDim` | `#F2A541` | `#F2A541` |
+| `surfaceDim` | `#DED9CE` | `#101E19` |
+| `surfaceBright` | `#FBF7EF` | `#283D33` |
+| `surfaceContainerLowest` | `#FFFFFF` | `#0B1511` |
+| `surfaceContainerLow` | `#F5F1E7` | `#14271F` |
+| `surfaceContainer` | `#EFEADF` | `#192F26` |
+| `surfaceContainerHigh` | `#E9E4D8` | `#20372C` |
+| `surfaceContainerHighest` | `#E3DED2` | `#283D33` |
+| `primaryFixed` | `#0B5D4E` | `#0B5D4E` |
+| `primaryFixedDim` | `#08483D` | `#08483D` |
+| `onPrimaryFixed` | `#FBF7EF` | `#FBF7EF` |
+| `onPrimaryFixedVariant` | `#FBF7EF` | `#FBF7EF` |
+| `secondaryFixed` | `#20251F` | `#20251F` |
+| `secondaryFixedDim` | `#101E19` | `#101E19` |
+| `onSecondaryFixed` | `#FBF7EF` | `#FBF7EF` |
+| `onSecondaryFixedVariant` | `#FBF7EF` | `#FBF7EF` |
+| `tertiaryFixed` | `#F2A541` | `#F2A541` |
+| `tertiaryFixedDim` | `#D68B29` | `#D68B29` |
 | `onTertiaryFixed` | `#2A1800` | `#2A1800` |
-| `onTertiaryFixedVariant` | `#613C00` | `#613C00` |
-
-The fixed roles intentionally use the same values in both themes. `surfaceTint` follows primary; `scrim` is black, with opacity supplied by Material components. Outlines and subtle dividers are decoration, not text colors.
+| `onTertiaryFixedVariant` | `#382000` | `#382000` |
 
 ### Contrast and application
 
-All 39 checked foreground/background combinations in **each** scheme meet WCAG AA's **4.5:1** threshold for normal text, including on-colors against their containers, both fixed backgrounds against their two on-colors, inverse text/actions, and both surface text colors against every surface level. The lowest ratio is **4.75:1** (`onTertiaryFixedVariant` on `tertiaryFixedDim`). Disabled component styling and user-selected dynamic palettes are outside this check.
+Run `python3 tools/check_contrast.py` to check the Kotlin palette directly. **150 text foreground/background pairs pass WCAG AA at 4.5:1**: 72 per appearance plus six brand/onboarding combinations. This covers on-colors, fixed and inverse roles, both surface text colors on all ten surface levels, and action/error/accent text on every neutral level. The light minimum is **4.75:1** (tertiary on surfaceDim); the dark minimum is **5.52:1** (onTertiaryFixedVariant on tertiaryFixedDim).
 
-Use each `on*` color on its corresponding background. Mango itself is an accent fill, not body text on paper: use the darker light-mode `tertiary` for readable accent text, and `onTertiaryContainer` on the mango container. Primary revenue tiles use `onPrimary`; neutral stat tiles use jade icons, `onSurface` values, and `onSurfaceVariant` labels. Product initials use opaque theme container/on-container pairs so they remain readable in dark mode.
+| Solid pairing | Contrast |
+| --- | ---: |
+| Paper on jade | 7.31:1 |
+| Paper on deep jade | 9.80:1 |
+| Ink on mango | 7.60:1 |
+| Paper on clay | 5.75:1 |
+| Paper on ink | 14.60:1 |
+| Jade on paper CTA | 7.31:1 |
 
-`res/values/colors.xml` shares jade, mango, and paper with the logo vectors. The default splash/window background aliases paper (`#FBF7EF`); `values-night/colors.xml` sets it to the dark surface (`#141813`). The existing day/night XML themes already consume `@color/splash_bg`.
+Mango is a fill, not body text on paper or jade. Use `onTertiaryContainer` for chip, navigation indicator, badge, and cart text. Disabled controls use opaque neutral fills; disabled text and user-selected dynamic neutral palettes are outside the measured brand-palette guarantee. Icons and labels on jade top/navigation bars use the matching onPrimary; selected navigation icons use the dark mango on-color.
+
+`SolidSystemBars` in the Compose theme file sets status/navigation icon appearance from the actual screen background through WindowCompat. Dark bars use light icons; the mango intro page uses dark icons. It targets the current dialog window when appropriate, so the full-screen camera retains black bars with light icons. System contrast scrims are disabled; Compose paints the opaque background beneath edge-to-edge system bars. The Register's tablet cart also paints jade under the status inset. The XML launch/window backgrounds use jade by day and deep jade at night, with light system icons.
+
+## First-run intro
+
+Four original, hand-authored shape-only Bodymovin 5.7.4 animations live in `app/src/main/res/raw/onboarding_{sell,scan,receipt,insights}.json`. Each uses a **512 × 512 canvas, 60fps, and a seamless 2.5-second loop** with jade, mango, paper, and clay geometry. There are no images, text layers, expressions, fonts, downloaded animations, or external assets. Layer and group stacking follows Bodymovin's front-to-back order. The printing receipt uses an animated local mask to keep the printing window fixed while the paper slides out.
+
+`OnboardingScreen` uses a four-page HorizontalPager and lottie-compose 6.7.1. The pages say “Benta in seconds”, “Scan, tap, tapos”, “Resibo na agad”, and “Know your kita”, with jade, mango, clay, and ink backgrounds. The illustration sits on a flat paper panel; swiping uses a small scale transition and an animated pill indicator. A brand-mark fallback covers both loading and failure. When the system animator duration scale is zero, the final frame is static and Next/dots switch without animation. The setting is observed live.
+
+After the last page, Get started opens “Set up your store”, prefilling the current store name and currency (default ₱). Saving writes those two fields and `onboarding_done` in one DataStore edit; existing tax, receipt, and appearance preferences are preserved. Skip writes only completion and retains the current settings. Errors keep the intro open for retry. Settings → About → **Replay intro** clears completion. Older installations without the key see the intro once.
+
+The Activity waits for the first real settings emission before choosing the intro or register, using a solid jade loading surface. Pages resize their illustrations and can scroll on short screens or large fonts; tablets use an illustration/text row. Setup scrolls with the keyboard and respects safe drawing insets.
+
+Validate resource structure, paths, timing, forbidden content, and the strict **<25,000-byte** budget with `python3 tools/check_lottie.py`. All four also parsed without warnings through the cached Lottie Android 6.7.1 parser in a local JVM harness using Android geometry/interpolator stubs. That parser check does not validate Android drawing; confirm rendering on the emulator.
 
 ## Type scale
 
@@ -115,4 +140,4 @@ Products, Sales, Insights, and Settings use compact pinned `TopAppBar` headers, 
 
 ## Validation and review
 
-The SVGs and Android vectors share identical mark paths. The safe circle and palette contrast were checked locally, and Android XML resources were compiled and linked directly with SDK 36 tools. **Gradle was not run.** Build and device verification remain with the maintainer: review the icon under launcher masks/themed icons, the two appearance modes, and dense price strings at larger font scales. No data or business behavior was changed.
+The original SVG and Android launcher geometry is unchanged. All Android resources were compiled/linked directly with SDK 36 tools, and all Kotlin sources compiled with cached Kotlin 2.3.20, the Compose compiler plugin, Compose 1.9.4, Material 3 1.4.0, and Lottie 6.7.1. The offline classpath used cached coroutines 1.9.0 for the unavailable 1.10.2 transitive binaries. **Gradle was not run.** Full dependency resolution, packaging, and device verification remain with the maintainer: review first launch and relaunch, Skip/setup/Replay intro, reduced motion, animation fallback, 480 × 800 phones, tablets, the keyboard and large fonts, both appearance modes and wallpaper neutrals, selected/low-stock cards, checkout, and camera/dialog system icons. Database, POS calculations, and versioning are unchanged.

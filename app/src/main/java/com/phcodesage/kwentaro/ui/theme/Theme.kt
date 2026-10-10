@@ -1,5 +1,8 @@
 package com.phcodesage.kwentaro.ui.theme
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,33 +15,40 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogWindowProvider
+import androidx.core.view.WindowCompat
 
-// "Palengke": jade anchors the shop, mango marks money moments, paper softens the surfaces.
+// Palengke uses opaque fills: jade bands, mango actions, paper work surfaces.
 // Keep the brand colors in sync with docs/brand and res/values/colors.xml.
-private val Jade = Color(0xFF0B5D4E)
+val Jade = Color(0xFF0B5D4E)
+val DeepJade = Color(0xFF08483D)
 private val JadeLight = Color(0xFF83D5BD)
-private val Mango = Color(0xFFF2A541)
-private val Paper = Color(0xFFFBF7EF)
-private val Ink = Color(0xFF20251F)
+val Mango = Color(0xFFF2A541)
+val Paper = Color(0xFFFBF7EF)
+val Ink = Color(0xFF20251F)
+val Clay = Color(0xFF9C4934)
 
 @OptIn(ExperimentalMaterial3Api::class)
 private val LightColors = lightColorScheme(
     primary = Jade,
     onPrimary = Color.White,
-    primaryContainer = Color(0xFFC6EBDD),
-    onPrimaryContainer = Color(0xFF073B30),
+    primaryContainer = Jade,
+    onPrimaryContainer = Paper,
     inversePrimary = JadeLight,
     secondary = Color(0xFF526458),
     onSecondary = Color.White,
-    secondaryContainer = Color(0xFFD6E8D7),
-    onSecondaryContainer = Color(0xFF23372A),
+    secondaryContainer = Color(0xFF283D33),
+    onSecondaryContainer = Paper,
     tertiary = Color(0xFF855000),
     onTertiary = Color.White,
     tertiaryContainer = Mango,
@@ -54,8 +64,8 @@ private val LightColors = lightColorScheme(
     inverseOnSurface = Color(0xFFF5F1E7),
     error = Color(0xFFA33226),
     onError = Color.White,
-    errorContainer = Color(0xFFFFDAD2),
-    onErrorContainer = Color(0xFF59180F),
+    errorContainer = Color(0xFFA33226),
+    onErrorContainer = Paper,
     outline = Color(0xFF6B7267),
     outlineVariant = Color(0xFFCCC7B9),
     scrim = Color.Black,
@@ -66,71 +76,71 @@ private val LightColors = lightColorScheme(
     surfaceContainer = Color(0xFFEFEADF),
     surfaceContainerHigh = Color(0xFFE9E4D8),
     surfaceContainerHighest = Color(0xFFE3DED2),
-    primaryFixed = Color(0xFFC6EBDD),
-    primaryFixedDim = JadeLight,
-    onPrimaryFixed = Color(0xFF002117),
-    onPrimaryFixedVariant = Color(0xFF174F40),
-    secondaryFixed = Color(0xFFD6E8D7),
-    secondaryFixedDim = Color(0xFFB9CCBA),
-    onSecondaryFixed = Color(0xFF102516),
-    onSecondaryFixedVariant = Color(0xFF3A5140),
-    tertiaryFixed = Color(0xFFFFDDA6),
-    tertiaryFixedDim = Mango,
+    primaryFixed = Jade,
+    primaryFixedDim = DeepJade,
+    onPrimaryFixed = Paper,
+    onPrimaryFixedVariant = Paper,
+    secondaryFixed = Ink,
+    secondaryFixedDim = Color(0xFF101E19),
+    onSecondaryFixed = Paper,
+    onSecondaryFixedVariant = Paper,
+    tertiaryFixed = Mango,
+    tertiaryFixedDim = Color(0xFFD68B29),
     onTertiaryFixed = Color(0xFF2A1800),
-    onTertiaryFixedVariant = Color(0xFF613C00),
+    onTertiaryFixedVariant = Color(0xFF382000),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 private val DarkColors = darkColorScheme(
-    primary = JadeLight,
-    onPrimary = Color(0xFF00382B),
-    primaryContainer = Color(0xFF0A5142),
-    onPrimaryContainer = Color(0xFFC6EBDD),
+    primary = DeepJade,
+    onPrimary = Paper,
+    primaryContainer = Jade,
+    onPrimaryContainer = Paper,
     inversePrimary = Jade,
-    secondary = Color(0xFFB9CCBA),
+    secondary = JadeLight,
     onSecondary = Color(0xFF243629),
-    secondaryContainer = Color(0xFF3A5140),
-    onSecondaryContainer = Color(0xFFD6E8D7),
+    secondaryContainer = Color(0xFF123B31),
+    onSecondaryContainer = Paper,
     tertiary = Mango,
     onTertiary = Color(0xFF422900),
-    tertiaryContainer = Color(0xFF634009),
-    onTertiaryContainer = Color(0xFFFFDDA6),
-    background = Color(0xFF141813),
-    onBackground = Color(0xFFE6E6DC),
-    surface = Color(0xFF141813),
-    onSurface = Color(0xFFE6E6DC),
-    surfaceVariant = Color(0xFF41493F),
+    tertiaryContainer = Mango,
+    onTertiaryContainer = Color(0xFF382000),
+    background = Color(0xFF101E19),
+    onBackground = Paper,
+    surface = Color(0xFF101E19),
+    onSurface = Paper,
+    surfaceVariant = Color(0xFF283D33),
     onSurfaceVariant = Color(0xFFC3CBBE),
-    surfaceTint = JadeLight,
+    surfaceTint = DeepJade,
     inverseSurface = Color(0xFFE6E6DC),
     inverseOnSurface = Color(0xFF2D332C),
     error = Color(0xFFFFB4A6),
     onError = Color(0xFF60190F),
-    errorContainer = Color(0xFF81281C),
-    onErrorContainer = Color(0xFFFFDAD2),
+    errorContainer = Color(0xFFA33226),
+    onErrorContainer = Paper,
     outline = Color(0xFF8D9788),
     outlineVariant = Color(0xFF41493F),
     scrim = Color.Black,
-    surfaceDim = Color(0xFF141813),
-    surfaceBright = Color(0xFF393E36),
-    surfaceContainerLowest = Color(0xFF0E120D),
-    surfaceContainerLow = Color(0xFF1C211A),
-    surfaceContainer = Color(0xFF20251E),
-    surfaceContainerHigh = Color(0xFF2A2F27),
-    surfaceContainerHighest = Color(0xFF353A32),
-    // Fixed roles deliberately retain their light appearance in either theme.
-    primaryFixed = Color(0xFFC6EBDD),
-    primaryFixedDim = JadeLight,
-    onPrimaryFixed = Color(0xFF002117),
-    onPrimaryFixedVariant = Color(0xFF174F40),
-    secondaryFixed = Color(0xFFD6E8D7),
-    secondaryFixedDim = Color(0xFFB9CCBA),
-    onSecondaryFixed = Color(0xFF102516),
-    onSecondaryFixedVariant = Color(0xFF3A5140),
-    tertiaryFixed = Color(0xFFFFDDA6),
-    tertiaryFixedDim = Mango,
+    surfaceDim = Color(0xFF101E19),
+    surfaceBright = Color(0xFF283D33),
+    surfaceContainerLowest = Color(0xFF0B1511),
+    surfaceContainerLow = Color(0xFF14271F),
+    surfaceContainer = Color(0xFF192F26),
+    surfaceContainerHigh = Color(0xFF20372C),
+    surfaceContainerHighest = Color(0xFF283D33),
+    // Fixed colors are solid brand fills in either appearance.
+    primaryFixed = Jade,
+    primaryFixedDim = DeepJade,
+    onPrimaryFixed = Paper,
+    onPrimaryFixedVariant = Paper,
+    secondaryFixed = Ink,
+    secondaryFixedDim = Color(0xFF101E19),
+    onSecondaryFixed = Paper,
+    onSecondaryFixedVariant = Paper,
+    tertiaryFixed = Mango,
+    tertiaryFixedDim = Color(0xFFD68B29),
     onTertiaryFixed = Color(0xFF2A1800),
-    onTertiaryFixedVariant = Color(0xFF613C00),
+    onTertiaryFixedVariant = Color(0xFF382000),
 )
 
 private val base = Typography()
@@ -176,10 +186,46 @@ fun KwentaroTheme(
     val colors = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val ctx = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(ctx) else dynamicLightColorScheme(ctx)
+            val wallpaper = if (darkTheme) dynamicDarkColorScheme(ctx) else dynamicLightColorScheme(ctx)
+            val brand = if (darkTheme) DarkColors else LightColors
+            // Retain wallpaper neutrals while keeping solid, recognizable action colors.
+            wallpaper.copy(
+                primary = brand.primary, onPrimary = brand.onPrimary,
+                primaryContainer = brand.primaryContainer, onPrimaryContainer = brand.onPrimaryContainer,
+                secondary = brand.secondary, onSecondary = brand.onSecondary,
+                secondaryContainer = brand.secondaryContainer, onSecondaryContainer = brand.onSecondaryContainer,
+                tertiary = brand.tertiary, onTertiary = brand.onTertiary,
+                tertiaryContainer = brand.tertiaryContainer, onTertiaryContainer = brand.onTertiaryContainer,
+                errorContainer = brand.errorContainer, onErrorContainer = brand.onErrorContainer,
+                surfaceTint = brand.surfaceTint,
+            )
         }
         darkTheme -> DarkColors
         else -> LightColors
     }
     MaterialTheme(colorScheme = colors, typography = KwentaroTypography, shapes = KwentaroShapes, content = content)
+}
+
+private fun Context.activity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.activity()
+    else -> null
+}
+
+/** Style the current window only: camera dialogs keep their own dark system bars. */
+@Composable
+fun SolidSystemBars(statusBackground: Color, navigationBackground: Color) {
+    val view = LocalView.current
+    if (view.isInEditMode) return
+    val window = (view.parent as? DialogWindowProvider)?.window ?: view.context.activity()?.window ?: return
+    SideEffect {
+        WindowCompat.getInsetsController(window, view).apply {
+            isAppearanceLightStatusBars = statusBackground.luminance() > 0.179f
+            isAppearanceLightNavigationBars = navigationBackground.luminance() > 0.179f
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+            window.isStatusBarContrastEnforced = false
+        }
+    }
 }

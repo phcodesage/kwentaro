@@ -16,6 +16,7 @@ data class StoreSettings(
     val taxInclusive: Boolean = true,
     val receiptFooter: String = "Salamat po! Come again.",
     val dynamicColor: Boolean = false,
+    val onboardingDone: Boolean = false,
 )
 
 private val Context.dataStore by preferencesDataStore("settings")
@@ -28,6 +29,7 @@ class SettingsRepository(private val context: Context) {
         val taxInclusive = booleanPreferencesKey("tax_inclusive")
         val footer = stringPreferencesKey("receipt_footer")
         val dynamicColor = booleanPreferencesKey("dynamic_color")
+        val onboardingDone = booleanPreferencesKey("onboarding_done")
     }
 
     val settings: Flow<StoreSettings> = context.dataStore.data.map { p ->
@@ -39,6 +41,7 @@ class SettingsRepository(private val context: Context) {
             taxInclusive = p[Keys.taxInclusive] ?: d.taxInclusive,
             receiptFooter = p[Keys.footer] ?: d.receiptFooter,
             dynamicColor = p[Keys.dynamicColor] ?: d.dynamicColor,
+            onboardingDone = p[Keys.onboardingDone] ?: d.onboardingDone,
         )
     }
 
@@ -50,6 +53,20 @@ class SettingsRepository(private val context: Context) {
             p[Keys.taxInclusive] = s.taxInclusive
             p[Keys.footer] = s.receiptFooter
             p[Keys.dynamicColor] = s.dynamicColor
+            p[Keys.onboardingDone] = s.onboardingDone
+        }
+    }
+
+    suspend fun setOnboardingDone(done: Boolean) {
+        context.dataStore.edit { it[Keys.onboardingDone] = done }
+    }
+
+    /** Commit setup and completion together, preserving tax, appearance and receipt preferences. */
+    suspend fun completeOnboarding(storeName: String, currencySymbol: String) {
+        context.dataStore.edit {
+            it[Keys.storeName] = storeName.trim()
+            it[Keys.currency] = currencySymbol.trim()
+            it[Keys.onboardingDone] = true
         }
     }
 }

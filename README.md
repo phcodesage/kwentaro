@@ -7,6 +7,11 @@
 Kwentaro has no accounts, no server, and no subscription. All data stays on the device.
 
 <p>
+  <img src="docs/screenshots/onboarding-sell.png" width="200" alt="Onboarding">
+  <img src="docs/screenshots/onboarding-scan.png" width="200" alt="Onboarding scan">
+  <img src="docs/screenshots/onboarding-setup.png" width="200" alt="Store setup">
+</p>
+<p>
   <img src="docs/screenshots/register.png" width="200" alt="Register">
   <img src="docs/screenshots/cart.png" width="200" alt="Cart">
   <img src="docs/screenshots/checkout.png" width="200" alt="Checkout">
@@ -22,6 +27,8 @@ Kwentaro has no accounts, no server, and no subscription. All data stays on the 
 
 ## Features
 
+- **Onboarding.** On first launch, four short Lottie animations introduce the app, followed by a quick store setup (name and currency). You can replay it from Settings. If the system has animations turned off, it shows still frames instead.
+
 - **Register.** A product grid with search and category filters. Tap a product to add it, and adjust quantities in the cart. You can also apply a 5/10/20% discount. Quantities can't exceed stock on hand.
 - **Camera barcode scanning.** Uses CameraX and on-device ML Kit, and reads EAN, UPC, QR, Code 128 and more. In continuous mode, every scan adds the item to the cart. There is a flashlight toggle, and the scanner falls back to the front camera on devices that have no rear camera.
 - **Product images.** Take a photo in the app with CameraX, pick one from the gallery, or choose from **126 built-in illustrations** of everyday PH store items (kape, pandesal, itlog, sardinas, e-load, and more). The illustrations are searchable in English and Tagalog. They are tiny vector drawables, about 63 KB in the APK for the whole set. New products get a matching image picked automatically from their name. Products with no image get a colored monogram tile.
@@ -30,7 +37,7 @@ Kwentaro has no accounts, no server, and no subscription. All data stays on the 
 - **Receipts.** Each sale gets a receipt number (`KW-YYMMDD-#####`). Receipts can be shared as text through any app (Messenger, Viber, email…). You can refund a sale, which puts its items back into stock.
 - **Inventory.** Track stock and cost for each item, set low-stock alerts, and edit a product by scanning its barcode.
 - **Insights.** Today's revenue, sale count, average ticket and gross profit, plus a 7-day bar chart, the week's best sellers and a restock list.
-- **Material 3.** Custom "Palengke" jade-and-mango palette with light and dark themes and optional Material You dynamic color. Phones get a bottom bar, and tablets get a navigation rail with the cart in a side panel.
+- **Material 3, solid style.** Bold, flat "Palengke" colors: solid jade bars and navigation with mango accents. Custom jade-and-mango palette with light and dark themes and optional Material You dynamic color. Phones get a bottom bar, and tablets get a navigation rail with the cart in a side panel.
 
 Brand assets, the color palette and type notes are in [`docs/brand`](docs/brand/README.md).
 
