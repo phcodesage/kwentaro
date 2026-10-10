@@ -12,6 +12,7 @@ datastore = "1.1.7"
 camerax = "1.5.1"
 mlkitBarcode = "17.3.0"
 coil = "2.7.0"
+lottie = "6.7.1"
 iconsExtended = "1.7.8"
 junit = "4.13.2"
 androidxTestExt = "1.2.1"
@@ -44,6 +45,7 @@ junit = { module = "junit:junit", version.ref = "junit" }
 androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestExt" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRunner" }
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "coroutinesPlayServices" }
+lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 
 [plugins]

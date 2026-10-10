@@ -117,6 +117,7 @@ dependencies {
     implementation(libs.mlkit.barcode.scanning)
 
     implementation(libs.coil.compose)
+    implementation(libs.lottie.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
