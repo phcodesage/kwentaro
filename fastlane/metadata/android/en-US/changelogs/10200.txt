@@ -1,0 +1,3 @@
+• Offline accounts: sign up and sign in without internet; each account keeps separate products, sales and settings
+• Recovery code for offline password resets; change password, switch and delete accounts
+• New open-source "foss" build with a ZXing scanner and no internet permission

@@ -42,14 +42,14 @@ jobs:
           KWENTARO_KEYSTORE_PASSWORD: ${{ secrets.KWENTARO_KEYSTORE_PASSWORD }}
           KWENTARO_KEY_ALIAS: ${{ secrets.KWENTARO_KEY_ALIAS }}
           KWENTARO_KEY_PASSWORD: ${{ secrets.KWENTARO_KEY_PASSWORD }}
-        run: ./gradlew testDebugUnitTest assembleDebug assembleRelease
+        run: ./gradlew testFullDebugUnitTest testFossDebugUnitTest assembleDebug assembleRelease
 
       - name: Publish GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          files="app/build/outputs/apk/debug/kwentaro-v$VERSION-debug.apk"
+          files="app/build/outputs/apk/full/debug/kwentaro-v$VERSION-full-debug.apk app/build/outputs/apk/foss/debug/kwentaro-v$VERSION-foss-debug.apk"
           # Only attach the release APK when it was signed; unsigned APKs can't be installed.
-          [ -n "$KWENTARO_KEYSTORE" ] && files="$files app/build/outputs/apk/release/kwentaro-v$VERSION-release.apk"
+          [ -n "$KWENTARO_KEYSTORE" ] && files="$files app/build/outputs/apk/full/release/kwentaro-v$VERSION-full-release.apk app/build/outputs/apk/foss/release/kwentaro-v$VERSION-foss-release.apk"
           notes=$(awk "/^## \\[$VERSION\\]/{f=1;next} /^## \\[/{f=0} f" CHANGELOG.md)
           gh release create "$GITHUB_REF_NAME" $files --title "Kwentaro $GITHUB_REF_NAME" --notes "${notes:-Release $GITHUB_REF_NAME}"

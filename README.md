@@ -4,12 +4,13 @@
 
 **Kwentaro** is an offline-first point-of-sale app for Android, written in Kotlin with Jetpack Compose and Material 3. It's built for sari-sari stores, cafés, bakeries and market stalls. The name comes from the Filipino *kwenta*, to count or tally.
 
-Kwentaro has no accounts, no server, and no subscription. All data stays on the device.
+Kwentaro is **free and open source (MIT)**. There's no server, no subscription and no cloud: all data stays on the device. Several people can share one phone with **offline accounts**, and each account keeps completely separate records.
 
 <p>
   <img src="docs/screenshots/onboarding-sell.png" width="200" alt="Onboarding">
   <img src="docs/screenshots/onboarding-scan.png" width="200" alt="Onboarding scan">
   <img src="docs/screenshots/onboarding-setup.png" width="200" alt="Store setup">
+  <img src="docs/screenshots/accounts.png" width="200" alt="Offline accounts">
 </p>
 <p>
   <img src="docs/screenshots/register.png" width="200" alt="Register">
@@ -27,10 +28,11 @@ Kwentaro has no accounts, no server, and no subscription. All data stays on the 
 
 ## Features
 
+- **Offline accounts.** Sign up with a name, username and password, with no internet or email needed. Passwords are stored only as salted PBKDF2 hashes. Each account has its **own database and settings files**, so products, sales and receipts never mix between people. Signing up shows a one-time **recovery code** for resetting a forgotten password offline. Settings lets you change your password, sign out or switch accounts, and delete an account. When upgrading from an older version, the first account adopts the existing store data.
 - **Onboarding.** On first launch, four short Lottie animations introduce the app, followed by a quick store setup (name and currency). You can replay it from Settings. If the system has animations turned off, it shows still frames instead.
 
 - **Register.** A product grid with search and category filters. Tap a product to add it, and adjust quantities in the cart. You can also apply a 5/10/20% discount. Quantities can't exceed stock on hand.
-- **Camera barcode scanning.** Uses CameraX and on-device ML Kit, and reads EAN, UPC, QR, Code 128 and more. In continuous mode, every scan adds the item to the cart. There is a flashlight toggle, and the scanner falls back to the front camera on devices that have no rear camera.
+- **Camera barcode scanning.** Uses CameraX with on-device ML Kit (`full` build) or ZXing (`foss` build), and reads EAN, UPC, QR, Code 128 and more. In continuous mode, every scan adds the item to the cart. There is a flashlight toggle, and the scanner falls back to the front camera on devices that have no rear camera.
 - **Product images.** Take a photo in the app with CameraX, pick one from the gallery, or choose from **126 built-in illustrations** of everyday PH store items (kape, pandesal, itlog, sardinas, e-load, and more). The illustrations are searchable in English and Tagalog. They are tiny vector drawables, about 63 KB in the APK for the whole set. New products get a matching image picked automatically from their name. Products with no image get a colored monogram tile.
 - **Checkout.** Pay by cash, card or e-wallet. For cash, quick-tender chips (Exact, next ₱20/50/100/500…) fill in the amount and the change is calculated live. You can add an optional customer name.
 - **VAT/tax.** Tax can be included in the price (the default, 12% PH VAT) or added on top. Money is stored in centavos, so totals never drift.
@@ -47,8 +49,10 @@ Brand assets, the color palette and type notes are in [`docs/brand`](docs/brand/
 |---|---|
 | UI | Jetpack Compose, Material 3, Navigation Compose |
 | Camera | CameraX (`camera-view`, `camera-mlkit-vision`) |
-| Barcodes | ML Kit Barcode Scanning (bundled model, works offline) |
-| Storage | Room (products, sales, sale items), DataStore (settings) |
+| Barcodes | `full`: ML Kit Barcode Scanning (bundled model) · `foss`: ZXing |
+| Storage | Room (one database per account, plus an accounts DB), DataStore (per-account settings) |
+| Auth | Offline PBKDF2-HMAC-SHA256 password hashes, recovery codes |
+| Animation | Lottie (onboarding) |
 | Images | Coil |
 
 The minimum SDK is 26 (Android 8.0) and the target SDK is 36.
@@ -56,8 +60,8 @@ The minimum SDK is 26 (Android 8.0) and the target SDK is 36.
 ## Tests
 
 ```bash
-./gradlew testDebugUnitTest          # VAT, discount, money parsing, EAN-13 check digits
-./gradlew connectedDebugAndroidTest   # decodes a real EAN-13 with the bundled ML Kit scanner
+./gradlew testFullDebugUnitTest testFossDebugUnitTest   # VAT, money, accounts/hashing, templates, ZXing decoding at every rotation
+./gradlew connectedFullDebugAndroidTest                 # decodes a real EAN-13 with the bundled ML Kit scanner (wipes app data on the device)
 ```
 
 ## Build
@@ -65,23 +69,43 @@ The minimum SDK is 26 (Android 8.0) and the target SDK is 36.
 The build needs JDK 17 and the Android SDK.
 
 ```bash
-./gradlew assembleDebug
-adb install app/build/outputs/apk/debug/app-debug.apk
+./gradlew assembleFossDebug    # 100% open source
+./gradlew assembleFullDebug    # with Google ML Kit
+adb install app/build/outputs/apk/foss/debug/kwentaro-v*-foss-debug.apk
 ```
 
-Or open the project in Android Studio and press Run. On first launch, the app is seeded with a sample catalogue.
+Or open the project in Android Studio, pick a build variant, and press Run. New accounts can start with a sample catalogue.
+
+### Build variants
+
+| Variant | Barcode engine | Proprietary code | Permissions | For |
+|---|---|---|---|---|
+| **`foss`** | ZXing (Apache-2.0) | **None** | Camera only, **no internet** | F-Droid, IzzyOnDroid, GitHub |
+| `full` | Google ML Kit (bundled) | ML Kit, Play Services basement | Camera, plus internet/network state added by ML Kit's telemetry | Google Play and other stores |
+
+Both variants share all code except the scanner engine (`app/src/{foss,full}`). F-Droid store metadata lives in [`fastlane/metadata/android`](fastlane/metadata/android).
+
+## Privacy
+
+Kwentaro has no analytics, ads or trackers of its own, and no backend. Shop data and account credentials never leave the device unless you share a receipt or export something yourself. The `foss` build can't reach the internet at all, since it doesn't request the permission. The `full` build includes Google ML Kit, whose bundled library sends anonymous usage telemetry to Google. Choose `foss` if that matters to you.
+
+## Contributing
+
+Issues and pull requests are welcome, especially translations, product illustrations and features for small shops. See [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) and [SECURITY.md](SECURITY.md).
 
 ## Project layout
 
 ```
 app/src/main/java/com/phcodesage/kwentaro/
 ├── data/          Room entities & DAOs, PosRepository (checkout/refund transactions), settings
+├── data/auth/     Offline accounts, password hashing, per-account sessions
 ├── ui/register/   Selling screen, cart, checkout sheet
 ├── ui/products/   Catalogue list & editor (photo + barcode)
 ├── ui/sales/      Sales history & receipt
 ├── ui/dashboard/  Insights
 ├── ui/settings/   Store, tax, appearance
-├── ui/camera/     CameraX scanner & photo capture
+├── ui/auth/       Sign in / sign up / recovery
+├── ui/camera/     CameraX scanner & photo capture (engine per flavor in src/full, src/foss)
 └── ui/theme/      Colors, type, shapes
 ```
 

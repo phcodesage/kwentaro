@@ -59,6 +59,18 @@ android {
         }
     }
 
+    // `full`: Google ML Kit scanner. `foss`: open-source ZXing scanner, no proprietary code (F-Droid).
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("full") {
+            dimension = "distribution"
+        }
+        create("foss") {
+            dimension = "distribution"
+            versionNameSuffix = "-foss"
+        }
+    }
+
     buildTypes {
         debug {
             versionNameSuffix = "-debug"
@@ -113,8 +125,9 @@ dependencies {
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
-    implementation(libs.androidx.camera.mlkit.vision)
-    implementation(libs.mlkit.barcode.scanning)
+    "fullImplementation"(libs.androidx.camera.mlkit.vision)
+    "fullImplementation"(libs.mlkit.barcode.scanning)
+    "fossImplementation"(libs.zxing.core)
 
     implementation(libs.coil.compose)
     implementation(libs.lottie.compose)
@@ -122,7 +135,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.runner)
-    androidTestImplementation(libs.kotlinx.coroutines.play.services)
+    "androidTestFullImplementation"(libs.kotlinx.coroutines.play.services)
 }
 
 tasks.register("printVersion") {

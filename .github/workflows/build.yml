@@ -15,8 +15,8 @@ jobs:
           distribution: temurin
           java-version: 17
       - uses: gradle/actions/setup-gradle@v4
-      - run: ./gradlew assembleDebug
+      - run: ./gradlew testFullDebugUnitTest testFossDebugUnitTest assembleDebug
       - uses: actions/upload-artifact@v4
         with:
-          name: kwentaro-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          name: kwentaro-debug-apks
+          path: app/build/outputs/apk/*/debug/*.apk

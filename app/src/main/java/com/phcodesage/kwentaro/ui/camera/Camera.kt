@@ -8,7 +8,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
-import androidx.camera.mlkit.vision.MlKitAnalyzer
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
@@ -70,9 +69,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.phcodesage.kwentaro.ui.theme.SolidSystemBars
 import java.io.File
+import java.util.concurrent.Executors
 import java.util.UUID
 
 private fun Context.hasCameraPermission() =
@@ -171,25 +170,23 @@ fun BarcodeScannerDialog(
     var lastAt by remember { mutableStateOf(0L) }
     CameraDialog(onDismiss) { controller ->
         DisposableEffect(controller) {
-            val scanner = BarcodeScanning.getClient()
-            val executor = ContextCompat.getMainExecutor(context)
+            // Decoding runs off the main thread; results are posted back to it.
+            val analysisExecutor = Executors.newSingleThreadExecutor()
+            val analyzer = createBarcodeAnalyzer(context) { code ->
+                val now = System.currentTimeMillis()
+                // The same code stays in frame for many frames; debounce repeats.
+                if (code == lastCode && now - lastAt < 2000) return@createBarcodeAnalyzer
+                lastCode = code
+                lastAt = now
+                onScanned(code)
+                if (!continuous) onDismiss()
+            }
             controller.setEnabledUseCases(CameraController.IMAGE_ANALYSIS)
-            controller.setImageAnalysisAnalyzer(
-                executor,
-                MlKitAnalyzer(listOf(scanner), CameraController.COORDINATE_SYSTEM_VIEW_REFERENCED, executor) { result ->
-                    val code = result?.getValue(scanner)?.firstOrNull()?.rawValue ?: return@MlKitAnalyzer
-                    val now = System.currentTimeMillis()
-                    // The same code stays in frame for many frames; debounce repeats.
-                    if (code == lastCode && now - lastAt < 2000) return@MlKitAnalyzer
-                    lastCode = code
-                    lastAt = now
-                    onScanned(code)
-                    if (!continuous) onDismiss()
-                },
-            )
+            controller.setImageAnalysisAnalyzer(analysisExecutor, analyzer)
             onDispose {
                 controller.clearImageAnalysisAnalyzer()
-                scanner.close()
+                analyzer.close()
+                analysisExecutor.shutdown()
             }
         }
         ScanOverlay()

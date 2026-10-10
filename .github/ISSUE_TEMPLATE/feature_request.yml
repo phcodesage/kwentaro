@@ -1,0 +1,9 @@
+name: Feature request
+description: Suggest an idea for shops using Kwentaro
+labels: [enhancement]
+body:
+  - type: textarea
+    attributes: { label: What problem does this solve for a shop?, description: "e.g. tracking utang, printing receipts" }
+    validations: { required: true }
+  - type: textarea
+    attributes: { label: Proposed solution }

@@ -1,0 +1,14 @@
+name: Bug report
+description: Something isn't working
+labels: [bug]
+body:
+  - type: textarea
+    attributes: { label: What happened?, description: "Steps to reproduce, what you expected, and what you saw." }
+    validations: { required: true }
+  - type: input
+    attributes: { label: App version, description: "Settings → About (e.g. 1.2.0-foss)" }
+    validations: { required: true }
+  - type: input
+    attributes: { label: Phone and Android version, placeholder: "e.g. Infinix Hot 40, Android 14" }
+  - type: textarea
+    attributes: { label: Screenshots or logs }

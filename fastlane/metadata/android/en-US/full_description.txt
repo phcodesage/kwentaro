@@ -1,0 +1,13 @@
+<p><b>Kwentaro</b> is a free, open-source point-of-sale app for sari-sari stores, carinderias, cafés, bakeries and market stalls. It works fully offline. No subscription and no cloud: your sales stay on your phone.</p>
+<p><b>Features</b></p>
+<ul>
+<li>Fast register: product grid, search, categories, cart, discounts</li>
+<li>Barcode scanning with the camera</li>
+<li>Cash, card and e-wallet checkout with quick-tender and live change</li>
+<li>VAT inclusive or exclusive; receipts you can share; refunds that restock</li>
+<li>Inventory with low-stock alerts and product photos, or 126 built-in illustrations</li>
+<li>Insights: revenue, gross profit, best sellers, 7-day chart</li>
+<li>Offline accounts: several people can use one phone with completely separate records</li>
+<li>Bold Material 3 design with light and dark themes</li>
+</ul>
+<p>The F-Droid build scans with ZXing, contains no proprietary code, and does not request internet access.</p>
